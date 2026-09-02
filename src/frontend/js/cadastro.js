@@ -279,16 +279,13 @@ formulario.addEventListener("submit", async (evento) => {
     };
 
     try {
-        const resposta = await fetch(
-            "/clientes"
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(dadosCliente)
-            }
-        );
+        const resposta = await fetch("/clientes", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(dadosCliente)
+});
 
         const resultado = await resposta.json();
 
