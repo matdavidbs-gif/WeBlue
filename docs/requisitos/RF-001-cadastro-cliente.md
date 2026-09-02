@@ -214,3 +214,75 @@ O cadastro será a porta de entrada do usuário para as funcionalidades privadas
 4. registra o erro técnico;
 5. apresenta uma mensagem solicitando uma nova tentativa;
 6. o caso de uso é encerrado sem criar a conta.
+
+## 4. Regras de Negócio
+
+### RN-001 — Preenchimento dos campos obrigatórios
+
+O nome completo, e-mail, CPF, telefone, senha e confirmação da senha são obrigatórios. O cadastro não poderá ser concluído enquanto algum desses campos estiver vazio.
+
+**Mensagem:** “Preencha todos os campos obrigatórios.”
+
+### RN-002 — E-mail único
+
+Cada endereço de e-mail poderá estar associado a apenas uma conta. A comparação deverá desconsiderar letras maiúsculas e minúsculas.
+
+**Mensagem:** “Este e-mail já está cadastrado.”
+
+### RN-003 — CPF único
+
+Cada CPF poderá estar associado a apenas uma conta na Weblue.
+
+**Mensagem:** “Este CPF já possui uma conta cadastrada.”
+
+### RN-004 — Validação do CPF
+
+O CPF deverá conter 11 números e ser aprovado pelo algoritmo oficial de validação dos dígitos verificadores. Pontos e traços poderão ser removidos antes do armazenamento.
+
+**Mensagem:** “Informe um CPF válido.”
+
+### RN-005 — Validação do e-mail
+
+O e-mail deverá possuir formato válido, contendo nome do usuário, símbolo `@` e domínio.
+
+**Mensagem:** “Informe um endereço de e-mail válido.”
+
+### RN-006 — Critérios de segurança da senha
+
+A senha deverá possuir:
+
+- no mínimo oito caracteres;
+- pelo menos uma letra maiúscula;
+- pelo menos uma letra minúscula;
+- pelo menos um número;
+- pelo menos um caractere especial.
+
+**Mensagem:** “A senha não atende aos critérios de segurança.”
+
+### RN-007 — Confirmação da senha
+
+A senha e sua confirmação deverão ser idênticas.
+
+**Mensagem:** “As senhas informadas não coincidem.”
+
+### RN-008 — Aceitação dos termos
+
+O cadastro somente poderá ser realizado após o usuário aceitar os termos de uso e a política de privacidade da Weblue.
+
+**Mensagem:** “Você precisa aceitar os termos e a política de privacidade.”
+
+### RN-009 — Situação inicial da conta
+
+Toda conta criada com sucesso deverá receber a situação inicial `ATIVA`, salvo quando houver uma etapa futura de confirmação do e-mail.
+
+### RN-010 — Identificador único
+
+Cada cliente deverá receber um identificador interno único, que não poderá ser alterado ou reutilizado por outro cadastro.
+
+### RN-011 — Registro da operação
+
+O sistema deverá registrar a data e a hora de criação da conta para controle e auditoria.
+
+### RN-012 — Proteção da senha
+
+A senha nunca poderá ser armazenada em texto simples. Antes do armazenamento, o sistema deverá transformá-la utilizando um algoritmo seguro de hash.
