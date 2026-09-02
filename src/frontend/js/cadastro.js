@@ -268,29 +268,59 @@ formulario.addEventListener("submit", async (evento) => {
 
     ativarCarregamento();
 
+    const dadosCliente = {
+        nome_completo: nome.value.trim(),
+        email: email.value.trim(),
+        cpf: cpf.value,
+        telefone: telefone.value,
+        senha: senha.value,
+        confirmar_senha: confirmarSenha.value,
+        aceitou_termos: aceiteTermos.checked
+    };
+
     try {
-        /*
-         * Simulação temporária.
-         * Esta parte será substituída pela chamada da API.
-         */
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const resposta = await fetch(
+            "http://127.0.0.1:8000/clientes",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(dadosCliente)
+            }
+        );
+
+        const resultado = await resposta.json();
+
+        if (!resposta.ok) {
+            let mensagemErro =
+                "Não foi possível concluir o cadastro.";
+
+            if (typeof resultado.detail === "string") {
+                mensagemErro = resultado.detail;
+            }
+
+            throw new Error(mensagemErro);
+        }
 
         formulario.reset();
 
         mostrarMensagem(
             "sucesso",
-            "Conta criada com sucesso! Você já pode entrar na Weblue."
+            `Conta criada com sucesso! Bem-vindo(a), ${resultado.nome_completo}.`
         );
-    } catch {
+
+    } catch (erro) {
         mostrarMensagem(
             "erro",
-            "Não foi possível concluir o cadastro. Tente novamente."
+            erro.message ||
+            "Não foi possível conectar com a Weblue."
         );
+
     } finally {
         desativarCarregamento();
     }
 });
-
 /* Remove o erro quando o usuário começa a corrigir */
 
 const camposMonitorados = [
