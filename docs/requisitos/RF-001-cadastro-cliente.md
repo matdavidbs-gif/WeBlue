@@ -384,3 +384,201 @@ A página de cadastro deverá funcionar nas versões atuais dos navegadores Goog
 A interface deverá apresentar os estados de formulário vazio, preenchido, carregamento, erro e sucesso.
 
 **Critério de aceitação:** Os cinco estados deverão ser demonstrados no protótipo funcional do RF-001.
+
+## 6. Arquitetura e Decisões Técnicas
+
+### 6.1 Visão geral da arquitetura
+
+O RF-001 utiliza uma arquitetura cliente-servidor dividida em camadas. A interface coleta os dados do usuário, a API aplica as validações e regras de negócio, e o banco de dados realiza a persistência.
+
+```mermaid
+flowchart TD
+    A["Cliente no navegador"]
+    B["Frontend HTML, CSS e JavaScript"]
+    C["API FastAPI"]
+    D["SQLAlchemy e PyMySQL"]
+    E["Banco MySQL"]
+
+    A --> B
+    B -->|POST /clientes| C
+    C --> D
+    D --> E
+    E --> D
+    D --> C
+    C -->|Resposta HTTP| B
+```
+
+### 6.2 Componentes da solução
+
+| Camada | Tecnologia | Responsabilidade |
+|---|---|---|
+| Apresentação | HTML, CSS e JavaScript | Exibir o formulário, validar dados básicos e apresentar os cinco estados da interface |
+| Aplicação | Python e FastAPI | Receber as solicitações e aplicar regras de negócio |
+| Validação | Pydantic | Validar nome, e-mail, CPF, telefone, senha e aceite dos termos |
+| Segurança | pwdlib e Argon2 | Gerar o hash seguro da senha |
+| Persistência | SQLAlchemy e PyMySQL | Realizar a comunicação entre a API e o banco |
+| Dados | MySQL | Armazenar os clientes cadastrados |
+| Documentação | Swagger e OpenAPI | Documentar e permitir testes da API |
+
+### 6.3 Fluxo dos dados
+
+1. O cliente preenche o formulário de cadastro;
+2. o JavaScript executa as validações iniciais;
+3. os dados são convertidos para JSON;
+4. o frontend envia uma requisição `POST /clientes`;
+5. o FastAPI recebe a solicitação;
+6. o Pydantic valida e normaliza os dados;
+7. a API verifica se o CPF ou e-mail já está cadastrado;
+8. a senha é transformada em hash;
+9. o SQLAlchemy envia os dados permitidos ao MySQL;
+10. o banco cria o registro e gera o identificador do cliente;
+11. a API retorna o código HTTP `201 Created`;
+12. o frontend limpa o formulário e apresenta a mensagem de sucesso.
+
+### 6.4 Contrato da API
+
+| Item | Definição |
+|---|---|
+| Método | `POST` |
+| Endpoint | `/clientes` |
+| Tipo de conteúdo | `application/json` |
+| Sucesso | `201 Created` |
+| Dados duplicados | `409 Conflict` |
+| Dados inválidos | `422 Unprocessable Content` |
+| Falha no banco | `503 Service Unavailable` |
+| Swagger local | `http://127.0.0.1:8000/docs` |
+| OpenAPI local | `http://127.0.0.1:8000/openapi.json` |
+
+### 6.5 Dados recebidos
+
+| Campo | Tipo | Obrigatório | Tratamento |
+|---|---|:---:|---|
+| `nome_completo` | Texto | Sim | Remoção de espaços excedentes |
+| `email` | E-mail | Sim | Conversão para letras minúsculas |
+| `cpf` | Texto | Sim | Remoção da máscara e validação dos dígitos |
+| `telefone` | Texto | Sim | Armazenamento somente dos números |
+| `senha` | Texto | Sim | Transformação em hash |
+| `confirmar_senha` | Texto | Sim | Usado somente para comparação |
+| `aceitou_termos` | Booleano | Sim | Deve possuir o valor `true` |
+
+### 6.6 Dados retornados
+
+A resposta da API contém somente os dados necessários:
+
+- identificador;
+- nome completo;
+- e-mail;
+- telefone;
+- situação da conta;
+- data de criação.
+
+O CPF, a confirmação da senha e o hash da senha não são retornados.
+
+### 6.7 Controles de segurança
+
+- A senha não é armazenada em texto simples;
+- o hash é produzido antes da persistência;
+- o arquivo `.env` não é enviado ao GitHub;
+- a aplicação utiliza um usuário próprio do MySQL;
+- CPF e e-mail possuem restrições de unicidade;
+- o backend repete todas as validações realizadas no frontend;
+- erros de banco não expõem informações internas;
+- a resposta da API não contém senha ou CPF;
+- o CORS permite somente as origens locais definidas durante o desenvolvimento.
+
+## 7. Registros de Decisão de Arquitetura — ADR
+
+### ADR-001 — Utilização do FastAPI
+
+**Status:** Aceita  
+**Data:** 02/09/2026
+
+**Contexto:**  
+A Weblue precisa disponibilizar uma API com validação de dados e documentação Swagger.
+
+**Decisão:**  
+Utilizar o FastAPI como framework do backend.
+
+**Alternativas consideradas:**
+
+- Django;
+- Flask;
+- Express com Node.js.
+
+**Justificativa:**  
+O FastAPI oferece integração com Pydantic, geração automática de OpenAPI e Swagger, boa organização de rotas e suporte a tipagem.
+
+**Consequências positivas:**
+
+- documentação automática;
+- validação estruturada;
+- facilidade para testar os endpoints;
+- código organizado por módulos.
+
+**Consequências negativas:**
+
+- necessidade de instalar e administrar o ambiente Python;
+- necessidade de configurar o servidor para publicação.
+
+### ADR-002 — Utilização do MySQL
+
+**Status:** Aceita  
+**Data:** 02/09/2026
+
+**Contexto:**  
+O sistema precisa armazenar clientes de forma estruturada, garantindo que CPF e e-mail não sejam duplicados.
+
+**Decisão:**  
+Utilizar o MySQL como banco de dados relacional e o SQLAlchemy como camada de persistência.
+
+**Alternativas consideradas:**
+
+- SQLite;
+- PostgreSQL;
+- MongoDB.
+
+**Justificativa:**  
+O MySQL permite restrições de unicidade, transações, integridade dos dados e ampla compatibilidade com serviços de hospedagem.
+
+**Consequências positivas:**
+
+- integridade dos registros;
+- suporte a consultas relacionais;
+- possibilidade de evolução do sistema;
+- script DDL versionado no GitHub.
+
+**Consequências negativas:**
+
+- necessidade de configurar um servidor de banco;
+- gerenciamento separado de usuários e permissões.
+
+### ADR-003 — Proteção das senhas com Argon2
+
+**Status:** Aceita  
+**Data:** 02/09/2026
+
+**Contexto:**  
+As senhas dos clientes são dados sensíveis e não podem ser armazenadas em texto simples.
+
+**Decisão:**  
+Utilizar a biblioteca `pwdlib` com algoritmo recomendado de hash Argon2.
+
+**Alternativas consideradas:**
+
+- armazenamento em texto simples;
+- SHA-256 sem salt;
+- bcrypt.
+
+**Justificativa:**  
+Argon2 é apropriado para armazenamento de senhas e gera um hash com salt e parâmetros de custo.
+
+**Consequências positivas:**
+
+- proteção das senhas armazenadas;
+- impossibilidade de recuperar diretamente a senha original;
+- atendimento aos requisitos de segurança do RF-001.
+
+**Consequências negativas:**
+
+- maior custo de processamento;
+- o sistema deverá utilizar verificação de hash no futuro login.
