@@ -1,5 +1,12 @@
 # RF-001 — Cadastro de Cliente
 
+## Integrantes
+
+- Carolina Gentil Cavalcante de Lima — carolina57935596@edu.df.senac.br
+- Clara Gentil Cavalcante de Lima — clara57935706@edu.df.senac.br
+- Maria Jeovana Silva Sales — maria59011916@edu.df.senac.br
+- Matheus David Borges Soares — matheus57132436@edu.df.senac.br
+
 ## 1. Identificação do Requisito
 
 - **ID:** RF-001
