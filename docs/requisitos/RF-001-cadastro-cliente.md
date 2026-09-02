@@ -286,3 +286,101 @@ O sistema deverá registrar a data e a hora de criação da conta para controle 
 ### RN-012 — Proteção da senha
 
 A senha nunca poderá ser armazenada em texto simples. Antes do armazenamento, o sistema deverá transformá-la utilizando um algoritmo seguro de hash.
+
+## 5. Requisitos Não Funcionais
+
+### RNF-001 — Segurança da comunicação
+
+**Categoria:** Segurança.
+
+Toda comunicação entre o navegador e a aplicação deverá utilizar HTTPS quando o sistema estiver publicado.
+
+**Critério de aceitação:** A aplicação não deverá transmitir dados cadastrais por uma conexão HTTP sem proteção.
+
+### RNF-002 — Proteção das senhas
+
+**Categoria:** Segurança.
+
+As senhas deverão ser armazenadas utilizando hash seguro, como Argon2id ou bcrypt. Senhas em texto simples não poderão ser registradas no banco de dados ou nos logs.
+
+**Critério de aceitação:** Ao consultar o banco de dados, não deverá ser possível visualizar ou recuperar a senha original do cliente.
+
+### RNF-003 — Desempenho
+
+**Categoria:** Desempenho.
+
+A solicitação de cadastro deverá ser processada em até dois segundos em condições normais de utilização, desconsiderando problemas externos de conexão.
+
+**Critério de aceitação:** Pelo menos 95% das solicitações de cadastro deverão apresentar resposta em até dois segundos durante os testes.
+
+### RNF-004 — Disponibilidade
+
+**Categoria:** Disponibilidade.
+
+A funcionalidade de cadastro deverá permanecer disponível durante o período de funcionamento da aplicação, exceto em manutenções programadas.
+
+**Critério de aceitação:** A aplicação publicada deverá buscar disponibilidade mensal mínima de 99%, desconsiderando manutenções previamente informadas.
+
+### RNF-005 — Responsividade
+
+**Categoria:** Compatibilidade.
+
+O formulário de cadastro deverá adaptar-se a computadores, tablets e celulares.
+
+**Critério de aceitação:** A página deverá funcionar sem rolagem horizontal em telas com largura entre 320 e 1920 pixels.
+
+### RNF-006 — Usabilidade
+
+**Categoria:** Usabilidade.
+
+Os campos deverão possuir rótulos claros, indicação dos itens obrigatórios e mensagens que orientem o usuário na correção de erros.
+
+**Critério de aceitação:** O usuário deverá conseguir identificar o campo incorreto e compreender como corrigir o problema.
+
+### RNF-007 — Acessibilidade
+
+**Categoria:** Acessibilidade.
+
+O formulário deverá utilizar HTML semântico, permitir navegação pelo teclado, apresentar foco visível e manter contraste adequado, seguindo a WCAG 2.2 no nível AA.
+
+**Critério de aceitação:** Todos os campos e botões deverão ser acessíveis pela tecla `Tab`, possuir rótulos associados e apresentar indicação visível de foco.
+
+### RNF-008 — Privacidade e LGPD
+
+**Categoria:** Privacidade.
+
+A Weblue deverá coletar somente os dados necessários para o cadastro e informar ao usuário a finalidade do tratamento desses dados.
+
+**Critério de aceitação:** O formulário deverá apresentar acesso à política de privacidade e solicitar o consentimento necessário antes da conclusão do cadastro.
+
+### RNF-009 — Integridade dos dados
+
+**Categoria:** Confiabilidade.
+
+O cadastro deverá ser concluído integralmente ou cancelado. O sistema não poderá armazenar contas incompletas quando ocorrer uma falha.
+
+**Critério de aceitação:** Em caso de erro durante a operação, nenhum registro parcial deverá permanecer no banco de dados.
+
+### RNF-010 — Auditoria e monitoramento
+
+**Categoria:** Manutenibilidade e segurança.
+
+O sistema deverá registrar data, hora, resultado da operação e identificador técnico da solicitação, sem incluir senha ou outros dados sensíveis nos logs.
+
+**Critério de aceitação:** O registro deverá permitir identificar sucesso ou falha da operação sem expor a senha do usuário.
+
+### RNF-011 — Compatibilidade com navegadores
+
+**Categoria:** Portabilidade.
+
+A página de cadastro deverá funcionar nas versões atuais dos navegadores Google Chrome, Microsoft Edge, Mozilla Firefox e Safari.
+
+**Critério de aceitação:** O fluxo principal deverá ser testado e concluído sem erros nos navegadores definidos.
+
+### RNF-012 — Estados da interface
+
+**Categoria:** Experiência do usuário.
+
+A interface deverá apresentar os estados de formulário vazio, preenchido, carregamento, erro e sucesso.
+
+**Critério de aceitação:** Os cinco estados deverão ser demonstrados no protótipo funcional do RF-001.
