@@ -582,3 +582,6 @@ Argon2 é apropriado para armazenamento de senhas e gera um hash com salt e par�
 
 - maior custo de processamento;
 - o sistema deverá utilizar verificação de hash no futuro login.
+
+- **Status:** Concluído
+- **Última atualização:** 02/09/2026
