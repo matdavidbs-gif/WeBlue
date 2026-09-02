@@ -280,7 +280,7 @@ formulario.addEventListener("submit", async (evento) => {
 
     try {
         const resposta = await fetch(
-            "http://127.0.0.1:8000/clientes",
+            "/clientes"
             {
                 method: "POST",
                 headers: {

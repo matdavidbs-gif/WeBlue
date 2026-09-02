@@ -585,3 +585,70 @@ Argon2 é apropriado para armazenamento de senhas e gera um hash com salt e par�
 
 - **Status:** Concluído
 - **Última atualização:** 02/09/2026
+
+# Plano e Relatório de Testes — RF-001
+
+## 1. Identificação
+
+- **Requisito:** RF-001 — Cadastro de Cliente
+- **Projeto:** Weblue
+- **Responsável:** Matheus David
+- **Data dos testes:** 02/09/2026
+- **Ambiente:** Local
+- **Frontend:** http://127.0.0.1:5500/cadastro.html
+- **API:** http://127.0.0.1:8000
+- **Swagger:** http://127.0.0.1:8000/docs
+- **Banco de dados:** MySQL — `weblue`
+
+## 2. Objetivo
+
+Verificar se o cadastro de clientes funciona corretamente, validando os dados, protegendo a senha, impedindo duplicidades e armazenando o cliente no MySQL.
+
+## 3. Casos de teste
+
+| ID | Cenário | Resultado esperado | Código HTTP | Resultado | Evidência |
+|---|---|---|:---:|---|---|
+| CT-001 | Cadastro com dados válidos | Criar a conta e apresentar sucesso | 201 | Aprovado | `05-cadastro-sucesso.png` |
+| CT-002 | Formulário vazio | Destacar campos obrigatórios | Não envia | Pendente | `01-formulario-vazio.png` |
+| CT-003 | CPF inválido | Informar que o CPF é inválido | Não envia | Aprovado | `04-validacao-erro.png` |
+| CT-004 | E-mail inválido | Informar que o e-mail é inválido | Não envia | Pendente | `[adicionar]` |
+| CT-005 | Senha fraca | Informar os critérios da senha | Não envia | Aprovado | `04-validacao-erro.png` |
+| CT-006 | Senhas diferentes | Informar que as senhas não coincidem | Não envia | Pendente | `[adicionar]` |
+| CT-007 | Termos não aceitos | Impedir o cadastro | Não envia | Pendente | `[adicionar]` |
+| CT-008 | E-mail já cadastrado | Recusar cadastro duplicado | 409 | Pendente | `[adicionar]` |
+| CT-009 | CPF já cadastrado | Recusar cadastro duplicado | 409 | Pendente | `[adicionar]` |
+| CT-010 | Cadastro pelo Swagger | Criar cliente pela API | 201 | Aprovado | `06-swagger-post-clientes.png` |
+| CT-011 | Persistência no MySQL | Registro deve existir no banco | — | Pendente | `07-registro-mysql.png` |
+
+## 4. Verificação de segurança
+
+| Verificação | Resultado |
+|---|---|
+| Senha não aparece na resposta da API | Aprovado |
+| CPF não aparece na resposta da API | Aprovado |
+| Senha armazenada como hash | Pendente de comprovação no MySQL |
+| Arquivo `.env` ignorado pelo Git | Pendente de confirmação |
+| Usuário próprio do banco utilizado | Aprovado |
+
+## 5. Critério de conclusão
+
+O RF-001 será considerado aprovado quando todos os casos de teste estiverem com status `Aprovado`, as evidências estiverem salvas e nenhum dado sensível estiver exposto.
+
+## 6. Resultado final
+
+- **Quantidade de testes:** 11
+- **Aprovados:** [preencher]
+- **Reprovados:** [preencher]
+- **Pendentes:** [preencher]
+- **Situação final do RF-001:** [Aprovado/Reprovado/Pendente]
+
+## Ambiente de Testes
+
+- **Sistema operacional:** Windows 11, 64 bits
+- **Navegador:** Google Chrome
+- **Frontend:** HTML, CSS e JavaScript
+- **Servidor do frontend:** Python HTTP Server — porta 5500
+- **Backend:** Python com FastAPI — porta 8000
+- **Banco de dados:** MySQL Community Server 8.0
+- **Documentação da API:** Swagger/OpenAPI
+- **Tipo de ambiente:** Desenvolvimento local
