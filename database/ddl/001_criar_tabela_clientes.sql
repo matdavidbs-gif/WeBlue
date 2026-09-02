@@ -1,0 +1,25 @@
+CREATE DATABASE IF NOT EXISTS weblue
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE weblue;
+
+CREATE TABLE IF NOT EXISTS clientes (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    nome_completo VARCHAR(150) NOT NULL,
+    email VARCHAR(254) NOT NULL,
+    cpf CHAR(11) NOT NULL,
+    telefone VARCHAR(11) NOT NULL,
+    senha_hash VARCHAR(255) NOT NULL,
+    status ENUM('ATIVA', 'INATIVA', 'BLOQUEADA')
+        NOT NULL DEFAULT 'ATIVA',
+    aceitou_termos_em DATETIME NOT NULL,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME NOT NULL
+        DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (id),
+    CONSTRAINT uq_clientes_email UNIQUE (email),
+    CONSTRAINT uq_clientes_cpf UNIQUE (cpf)
+) ENGINE=InnoDB;
