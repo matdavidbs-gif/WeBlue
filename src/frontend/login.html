@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Login de clientes na plataforma Weblue."
+    >
+
+    <title>Entrar | Weblue</title>
+
+    <link rel="stylesheet" href="./css/login.css?v=1">
+</head>
+
+<body>
+    <main class="pagina-login">
+
+        <section class="painel-marca" aria-label="Apresentação da Weblue">
+            <div class="marca">
+                <span class="marca-simbolo" aria-hidden="true">W</span>
+                <span class="marca-nome">Weblue</span>
+            </div>
+
+            <div class="apresentacao">
+                <p class="apresentacao-destaque">Sua beleza, do seu jeito</p>
+
+                <h1>Que bom ter você de volta!</h1>
+
+                <p>
+                    Entre em sua conta para acessar seus produtos favoritos
+                    e acompanhar seus pedidos.
+                </p>
+            </div>
+
+            <div class="decoracao decoracao-um" aria-hidden="true"></div>
+            <div class="decoracao decoracao-dois" aria-hidden="true"></div>
+        </section>
+
+        <section class="area-formulario">
+            <div class="formulario-container">
+
+                <header class="formulario-cabecalho">
+                    <p class="etapa">Acesso do cliente</p>
+                    <h2>Entre na sua conta</h2>
+                    <p>Informe seu e-mail e sua senha.</p>
+                </header>
+
+                <form id="formLogin" novalidate>
+
+                    <div class="campo">
+                        <label for="email">E-mail</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="seuemail@exemplo.com"
+                            autocomplete="email"
+                            required
+                        >
+
+                        <small class="mensagem-erro" id="erroEmail"></small>
+                    </div>
+
+                    <div class="campo">
+                        <label for="senha">Senha</label>
+
+                        <div class="campo-senha">
+                            <input
+                                type="password"
+                                id="senha"
+                                name="senha"
+                                placeholder="Digite sua senha"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="botaoMostrarSenha"
+                                class="mostrar-senha"
+                                aria-label="Mostrar senha"
+                            >
+                                Mostrar
+                            </button>
+                        </div>
+
+                        <small class="mensagem-erro" id="erroSenha"></small>
+                    </div>
+
+                    <div class="opcoes-login">
+                        <label class="lembrar">
+                            <input type="checkbox" id="lembrar">
+                            Lembrar de mim
+                        </label>
+
+                        <a href="#" class="link">Esqueci minha senha</a>
+                    </div>
+
+                    <div
+                        id="mensagemLogin"
+                        class="mensagem-login"
+                        role="alert"
+                        aria-live="polite"
+                    ></div>
+
+                    <button type="submit" id="botaoEntrar" class="botao-entrar">
+                        Entrar
+                    </button>
+
+                    <p class="cadastro-link">
+                        Ainda não possui uma conta?
+                        <a href="cadastro.html">Cadastre-se</a>
+                    </p>
+
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="./js/login.js"></script>
+</body>
+</html>

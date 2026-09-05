@@ -10,6 +10,7 @@ from sqlalchemy import text
 from .database import Base, engine
 from .models.cliente import Cliente
 from .routers.clientes import router as clientes_router
+from .routers.login import router as login_router
 
 
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
@@ -40,6 +41,7 @@ app.add_middleware(
 )
 
 app.include_router(clientes_router)
+app.include_router(login_router)
 
 app.mount(
     "/css",
@@ -57,6 +59,10 @@ app.mount(
 @app.get("/", include_in_schema=False)
 def pagina_cadastro():
     return FileResponse(FRONTEND_DIR / "cadastro.html")
+
+@app.get("/login", include_in_schema=False)
+def pagina_login():
+    return FileResponse(FRONTEND_DIR / "login.html")
 
 
 @app.get("/api", tags=["Informações"])
