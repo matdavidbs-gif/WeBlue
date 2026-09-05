@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar senha | Weblue</title>
+    <link rel="stylesheet" href="/css/recuperar-senha.css">
+</head>
+<body>
+
+    <main class="pagina-recuperacao">
+
+        <section class="painel-marca">
+            <div class="logo">
+                <span class="logo-icone">W</span>
+                <span class="logo-texto">Weblue</span>
+            </div>
+
+            <div class="conteudo-marca">
+                <p class="subtitulo">SUA BELEZA, DO SEU JEITO</p>
+                <h1>Recupere o acesso à sua conta.</h1>
+                <p>
+                    Defina uma nova senha para continuar aproveitando
+                    sua experiência na Weblue.
+                </p>
+            </div>
+        </section>
+
+        <section class="painel-formulario">
+            <div class="formulario-container">
+
+                <p class="identificacao">RECUPERAÇÃO DE ACESSO</p>
+
+                <h2>Crie uma nova senha</h2>
+
+                <p class="descricao">
+                    Informe o e-mail cadastrado e escolha uma nova senha.
+                </p>
+
+                <form id="form-recuperacao">
+
+                    <div class="campo">
+                        <label for="email">E-mail</label>
+                        <input
+                            type="email"
+                            id="email"
+                            placeholder="seuemail@exemplo.com"
+                            required
+                        >
+                    </div>
+
+                    <div class="campo">
+                        <label for="nova-senha">Nova senha</label>
+
+                        <div class="campo-senha">
+                            <input
+                                type="password"
+                                id="nova-senha"
+                                placeholder="Digite a nova senha"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="mostrar-senha"
+                                data-alvo="nova-senha"
+                            >
+                                Mostrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="confirmar-senha">Confirmar nova senha</label>
+
+                        <div class="campo-senha">
+                            <input
+                                type="password"
+                                id="confirmar-senha"
+                                placeholder="Digite novamente a senha"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="mostrar-senha"
+                                data-alvo="confirmar-senha"
+                            >
+                                Mostrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="criterios">
+                        <p>A senha deve possuir:</p>
+                        <ul>
+                            <li>pelo menos 8 caracteres;</li>
+                            <li>uma letra maiúscula;</li>
+                            <li>uma letra minúscula;</li>
+                            <li>um número;</li>
+                            <li>um caractere especial.</li>
+                        </ul>
+                    </div>
+
+                    <div id="mensagem" class="mensagem"></div>
+
+                    <button type="submit" class="botao-principal">
+                        Alterar senha
+                    </button>
+
+                    <a href="/login" class="voltar-login">
+                        Voltar para o login
+                    </a>
+
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="/js/recuperar-senha.js"></script>
+</body>
+</html>
