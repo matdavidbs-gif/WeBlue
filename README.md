@@ -8,5 +8,5 @@ E-commerce de cosméticos desenvolvido para o projeto de Laboratório de Inovaç
 - **Branch principal:** `main`
 - **Aplicação publicada:** Pendente
 - **Banco de dados:** Concluido
-- **API / Swagger:** concluido
+- **API / Swagger:** Concluido
 - **Demonstração:** Pendente
