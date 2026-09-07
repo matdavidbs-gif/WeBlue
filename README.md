@@ -7,6 +7,6 @@ E-commerce de cosméticos desenvolvido para o projeto de Laboratório de Inovaç
 - **Repositório GitHub:** https://github.com/matdavidbs-gif/WeBlue
 - **Branch principal:** `main`
 - **Aplicação publicada:** Pendente
-- **Banco de dados:** Pendente
-- **API / Swagger:** Pendente
+- **Banco de dados:** Concluido
+- **API / Swagger:** concluido
 - **Demonstração:** Pendente
