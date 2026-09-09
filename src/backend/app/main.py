@@ -42,7 +42,14 @@ app.add_middleware(
         "https://weblue-production.up.railway.app"
     ],
     allow_credentials=False,
-    allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=[
+        "GET",
+        "POST",
+        "PATCH",
+        "PUT",
+        "DELETE",
+        "OPTIONS"
+    ],
     allow_headers=["*"],
 )
 
@@ -67,9 +74,17 @@ app.mount(
 )
 
 
-# PÁGINAS DO SITE
+# =========================
+# PÁGINAS DO FRONTEND
+# =========================
+
 
 @app.get("/", include_in_schema=False)
+def pagina_inicial():
+    return FileResponse(FRONTEND_DIR / "cadastro.html")
+
+
+@app.get("/cadastro", include_in_schema=False)
 def pagina_cadastro():
     return FileResponse(FRONTEND_DIR / "cadastro.html")
 
@@ -81,7 +96,9 @@ def pagina_login():
 
 @app.get("/recuperar-senha", include_in_schema=False)
 def pagina_recuperar_senha():
-    return FileResponse(FRONTEND_DIR / "recuperar-senha.html")
+    return FileResponse(
+        FRONTEND_DIR / "recuperar-senha.html"
+    )
 
 
 @app.get("/cliente", include_in_schema=False)
@@ -89,7 +106,10 @@ def pagina_cliente():
     return FileResponse(FRONTEND_DIR / "cliente.html")
 
 
-# INFORMAÇÕES
+# =========================
+# INFORMAÇÕES DA API
+# =========================
+
 
 @app.get("/api", tags=["Informações"])
 def informacoes_api():
@@ -99,7 +119,10 @@ def informacoes_api():
     }
 
 
+# =========================
 # MONITORAMENTO
+# =========================
+
 
 @app.get("/health", tags=["Monitoramento"])
 def verificar_saude():

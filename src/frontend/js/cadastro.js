@@ -11,12 +11,16 @@ const aceiteTermos = document.getElementById("aceiteTermos");
 const botaoCadastrar = document.getElementById("botaoCadastrar");
 const textoBotao = document.getElementById("textoBotao");
 const carregandoBotao = document.getElementById("carregandoBotao");
+
 const mensagemFormulario = document.getElementById("mensagemFormulario");
+
 
 /* Máscaras */
 
 cpf.addEventListener("input", () => {
-    let valor = cpf.value.replace(/\D/g, "").slice(0, 11);
+    let valor = cpf.value
+        .replace(/\D/g, "")
+        .slice(0, 11);
 
     valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
     valor = valor.replace(/(\d{3})(\d)/, "$1.$2");
@@ -25,8 +29,11 @@ cpf.addEventListener("input", () => {
     cpf.value = valor;
 });
 
+
 telefone.addEventListener("input", () => {
-    let valor = telefone.value.replace(/\D/g, "").slice(0, 11);
+    let valor = telefone.value
+        .replace(/\D/g, "")
+        .slice(0, 11);
 
     if (valor.length > 10) {
         valor = valor.replace(
@@ -43,6 +50,7 @@ telefone.addEventListener("input", () => {
     telefone.value = valor;
 });
 
+
 /* Funções de mensagens */
 
 function apresentarErro(campo, elementoErro, mensagem) {
@@ -51,11 +59,13 @@ function apresentarErro(campo, elementoErro, mensagem) {
     elementoErro.textContent = mensagem;
 }
 
+
 function limparErro(campo, elementoErro) {
     campo.classList.remove("invalido");
     campo.removeAttribute("aria-invalid");
     elementoErro.textContent = "";
 }
+
 
 function mostrarMensagem(tipo, mensagem) {
     mensagemFormulario.hidden = false;
@@ -63,11 +73,13 @@ function mostrarMensagem(tipo, mensagem) {
     mensagemFormulario.textContent = mensagem;
 }
 
+
 function esconderMensagem() {
     mensagemFormulario.hidden = true;
     mensagemFormulario.className = "mensagem-formulario";
     mensagemFormulario.textContent = "";
 }
+
 
 /* Validação do CPF */
 
@@ -113,6 +125,7 @@ function cpfValido(valor) {
     return segundoDigito === Number(numeros[10]);
 }
 
+
 /* Validação do formulário */
 
 function validarFormulario() {
@@ -124,9 +137,13 @@ function validarFormulario() {
     const erroCpf = document.getElementById("erroCpf");
     const erroTelefone = document.getElementById("erroTelefone");
     const erroSenha = document.getElementById("erroSenha");
+
     const erroConfirmarSenha =
         document.getElementById("erroConfirmarSenha");
-    const erroTermos = document.getElementById("erroTermos");
+
+    const erroTermos =
+        document.getElementById("erroTermos");
+
 
     limparErro(nome, erroNome);
     limparErro(email, erroEmail);
@@ -137,9 +154,15 @@ function validarFormulario() {
 
     erroTermos.textContent = "";
 
-    const camposNome = nome.value.trim().split(/\s+/);
 
-    if (nome.value.trim().length < 3 || camposNome.length < 2) {
+    const camposNome = nome.value
+        .trim()
+        .split(/\s+/);
+
+    if (
+        nome.value.trim().length < 3 ||
+        camposNome.length < 2
+    ) {
         apresentarErro(
             nome,
             erroNome,
@@ -150,7 +173,9 @@ function validarFormulario() {
         valido = false;
     }
 
-    const formatoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const formatoEmail =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!formatoEmail.test(email.value.trim())) {
         apresentarErro(
@@ -163,6 +188,7 @@ function validarFormulario() {
         valido = false;
     }
 
+
     if (!cpfValido(cpf.value)) {
         apresentarErro(
             cpf,
@@ -174,7 +200,9 @@ function validarFormulario() {
         valido = false;
     }
 
-    const numerosTelefone = telefone.value.replace(/\D/g, "");
+
+    const numerosTelefone =
+        telefone.value.replace(/\D/g, "");
 
     if (
         numerosTelefone.length !== 10 &&
@@ -190,6 +218,7 @@ function validarFormulario() {
         valido = false;
     }
 
+
     const senhaForte =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
@@ -203,6 +232,7 @@ function validarFormulario() {
         primeiroCampoInvalido ??= senha;
         valido = false;
     }
+
 
     if (
         confirmarSenha.value === "" ||
@@ -218,6 +248,7 @@ function validarFormulario() {
         valido = false;
     }
 
+
     if (!aceiteTermos.checked) {
         erroTermos.textContent =
             "Você precisa aceitar os termos e a política de privacidade.";
@@ -226,98 +257,147 @@ function validarFormulario() {
         valido = false;
     }
 
+
     if (!valido) {
         mostrarMensagem(
             "erro",
             "Não foi possível criar a conta. Verifique os campos destacados."
         );
 
-        primeiroCampoInvalido.focus();
+        if (primeiroCampoInvalido) {
+            primeiroCampoInvalido.focus();
+        }
     }
 
     return valido;
 }
 
+
 /* Estado de carregamento */
 
 function ativarCarregamento() {
     botaoCadastrar.disabled = true;
-    botaoCadastrar.setAttribute("aria-busy", "true");
 
-    textoBotao.textContent = "Criando conta...";
+    botaoCadastrar.setAttribute(
+        "aria-busy",
+        "true"
+    );
+
+    textoBotao.textContent =
+        "Criando conta...";
+
     carregandoBotao.hidden = false;
 }
 
+
 function desativarCarregamento() {
     botaoCadastrar.disabled = false;
-    botaoCadastrar.removeAttribute("aria-busy");
 
-    textoBotao.textContent = "Criar minha conta";
+    botaoCadastrar.removeAttribute(
+        "aria-busy"
+    );
+
+    textoBotao.textContent =
+        "Criar minha conta";
+
     carregandoBotao.hidden = true;
 }
 
+
 /* Envio do formulário */
 
-formulario.addEventListener("submit", async (evento) => {
-    evento.preventDefault();
-    esconderMensagem();
+formulario.addEventListener(
+    "submit",
+    async (evento) => {
 
-    if (!validarFormulario()) {
-        return;
-    }
+        evento.preventDefault();
 
-    ativarCarregamento();
+        esconderMensagem();
 
-    const dadosCliente = {
-        nome_completo: nome.value.trim(),
-        email: email.value.trim(),
-        cpf: cpf.value,
-        telefone: telefone.value,
-        senha: senha.value,
-        confirmar_senha: confirmarSenha.value,
-        aceitou_termos: aceiteTermos.checked
-    };
-
-    try {
-        const resposta = await fetch("/clientes", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(dadosCliente)
-});
-
-        const resultado = await resposta.json();
-
-        if (!resposta.ok) {
-            let mensagemErro =
-                "Não foi possível concluir o cadastro.";
-
-            if (typeof resultado.detail === "string") {
-                mensagemErro = resultado.detail;
-            }
-
-            throw new Error(mensagemErro);
+        if (!validarFormulario()) {
+            return;
         }
 
-        formulario.reset();
+        ativarCarregamento();
 
-        mostrarMensagem(
-            "sucesso",
-            `Conta criada com sucesso! Bem-vindo(a), ${resultado.nome_completo}.`
-        );
 
-    } catch (erro) {
-        mostrarMensagem(
-            "erro",
-            erro.message ||
-            "Não foi possível conectar com a Weblue."
-        );
+        const dadosCliente = {
+            nome_completo: nome.value.trim(),
+            email: email.value.trim(),
+            cpf: cpf.value,
+            telefone: telefone.value,
+            senha: senha.value,
+            confirmar_senha: confirmarSenha.value,
+            aceitou_termos: aceiteTermos.checked
+        };
 
-    } finally {
-        desativarCarregamento();
+
+        try {
+
+            const resposta = await fetch(
+                "/clientes",
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(dadosCliente)
+                }
+            );
+
+
+            const resultado = await resposta.json();
+
+
+            if (!resposta.ok) {
+
+                let mensagemErro =
+                    "Não foi possível concluir o cadastro.";
+
+                if (
+                    typeof resultado.detail === "string"
+                ) {
+                    mensagemErro =
+                        resultado.detail;
+                }
+
+                throw new Error(mensagemErro);
+            }
+
+
+            formulario.reset();
+
+
+            mostrarMensagem(
+                "sucesso",
+                `Conta criada com sucesso! Bem-vindo(a), ${resultado.nome_completo}.`
+            );
+
+
+            setTimeout(() => {
+                window.location.href = "/login";
+            }, 1500);
+
+
+        } catch (erro) {
+
+            mostrarMensagem(
+                "erro",
+                erro.message ||
+                "Não foi possível conectar com a Weblue."
+            );
+
+        } finally {
+
+            desativarCarregamento();
+
+        }
     }
-});
+);
+
+
 /* Remove o erro quando o usuário começa a corrigir */
 
 const camposMonitorados = [
@@ -329,14 +409,37 @@ const camposMonitorados = [
     [confirmarSenha, "erroConfirmarSenha"]
 ];
 
-camposMonitorados.forEach(([campo, idErro]) => {
-    campo.addEventListener("input", () => {
-        limparErro(campo, document.getElementById(idErro));
-        esconderMensagem();
-    });
-});
 
-aceiteTermos.addEventListener("change", () => {
-    document.getElementById("erroTermos").textContent = "";
-    esconderMensagem();
-});
+camposMonitorados.forEach(
+    ([campo, idErro]) => {
+
+        campo.addEventListener(
+            "input",
+            () => {
+
+                limparErro(
+                    campo,
+                    document.getElementById(idErro)
+                );
+
+                esconderMensagem();
+
+            }
+        );
+
+    }
+);
+
+
+aceiteTermos.addEventListener(
+    "change",
+    () => {
+
+        document
+            .getElementById("erroTermos")
+            .textContent = "";
+
+        esconderMensagem();
+
+    }
+);
