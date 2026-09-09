@@ -2,7 +2,11 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <meta
         name="description"
@@ -11,22 +15,37 @@
 
     <title>Cadastre-se | Weblue</title>
 
-    <link rel="stylesheet" href="css/cadastro.css">
+    <link rel="stylesheet" href="/css/cadastro.css">
 </head>
 
 <body>
     <main class="pagina-cadastro">
 
-        <section class="painel-marca" aria-label="Apresentação da Weblue">
+        <section
+            class="painel-marca"
+            aria-label="Apresentação da Weblue"
+        >
             <div class="marca">
-                <span class="marca-simbolo" aria-hidden="true">W</span>
-                <span class="marca-nome">Weblue</span>
+                <span
+                    class="marca-simbolo"
+                    aria-hidden="true"
+                >
+                    W
+                </span>
+
+                <span class="marca-nome">
+                    Weblue
+                </span>
             </div>
 
             <div class="apresentacao">
-                <p class="apresentacao-destaque">Sua beleza, do seu jeito</p>
+                <p class="apresentacao-destaque">
+                    Sua beleza, do seu jeito
+                </p>
 
-                <h1>Descubra cosméticos escolhidos para você.</h1>
+                <h1>
+                    Descubra cosméticos escolhidos para você.
+                </h1>
 
                 <p>
                     Crie sua conta para comprar seus produtos favoritos
@@ -34,23 +53,40 @@
                 </p>
             </div>
 
-            <div class="decoracao decoracao-um" aria-hidden="true"></div>
-            <div class="decoracao decoracao-dois" aria-hidden="true"></div>
+            <div
+                class="decoracao decoracao-um"
+                aria-hidden="true"
+            ></div>
+
+            <div
+                class="decoracao decoracao-dois"
+                aria-hidden="true"
+            ></div>
         </section>
 
         <section class="area-formulario">
             <div class="formulario-container">
 
                 <header class="formulario-cabecalho">
-                    <p class="etapa">Cadastro de cliente</p>
-                    <h2>Crie sua conta</h2>
-                    <p>Preencha seus dados para entrar na Weblue.</p>
+                    <p class="etapa">
+                        Cadastro de cliente
+                    </p>
+
+                    <h2>
+                        Crie sua conta
+                    </h2>
+
+                    <p>
+                        Preencha seus dados para entrar na Weblue.
+                    </p>
                 </header>
 
                 <form id="formCadastro" novalidate>
 
                     <div class="campo campo-completo">
-                        <label for="nome">Nome completo</label>
+                        <label for="nome">
+                            Nome completo
+                        </label>
 
                         <input
                             type="text"
@@ -63,11 +99,16 @@
                             aria-describedby="erroNome"
                         >
 
-                        <small class="erro-campo" id="erroNome"></small>
+                        <small
+                            class="erro-campo"
+                            id="erroNome"
+                        ></small>
                     </div>
 
                     <div class="campo campo-completo">
-                        <label for="email">E-mail</label>
+                        <label for="email">
+                            E-mail
+                        </label>
 
                         <input
                             type="email"
@@ -79,12 +120,18 @@
                             aria-describedby="erroEmail"
                         >
 
-                        <small class="erro-campo" id="erroEmail"></small>
+                        <small
+                            class="erro-campo"
+                            id="erroEmail"
+                        ></small>
                     </div>
 
                     <div class="linha-campos">
+
                         <div class="campo">
-                            <label for="cpf">CPF</label>
+                            <label for="cpf">
+                                CPF
+                            </label>
 
                             <input
                                 type="text"
@@ -98,11 +145,16 @@
                                 aria-describedby="erroCpf"
                             >
 
-                            <small class="erro-campo" id="erroCpf"></small>
+                            <small
+                                class="erro-campo"
+                                id="erroCpf"
+                            ></small>
                         </div>
 
                         <div class="campo">
-                            <label for="telefone">Telefone</label>
+                            <label for="telefone">
+                                Telefone
+                            </label>
 
                             <input
                                 type="tel"
@@ -116,13 +168,20 @@
                                 aria-describedby="erroTelefone"
                             >
 
-                            <small class="erro-campo" id="erroTelefone"></small>
+                            <small
+                                class="erro-campo"
+                                id="erroTelefone"
+                            ></small>
                         </div>
+
                     </div>
 
                     <div class="linha-campos">
+
                         <div class="campo">
-                            <label for="senha">Senha</label>
+                            <label for="senha">
+                                Senha
+                            </label>
 
                             <input
                                 type="password"
@@ -135,15 +194,23 @@
                                 aria-describedby="ajudaSenha erroSenha"
                             >
 
-                            <small class="ajuda-campo" id="ajudaSenha">
+                            <small
+                                class="ajuda-campo"
+                                id="ajudaSenha"
+                            >
                                 Use oito ou mais caracteres.
                             </small>
 
-                            <small class="erro-campo" id="erroSenha"></small>
+                            <small
+                                class="erro-campo"
+                                id="erroSenha"
+                            ></small>
                         </div>
 
                         <div class="campo">
-                            <label for="confirmarSenha">Confirmar senha</label>
+                            <label for="confirmarSenha">
+                                Confirmar senha
+                            </label>
 
                             <input
                                 type="password"
@@ -161,9 +228,11 @@
                                 id="erroConfirmarSenha"
                             ></small>
                         </div>
+
                     </div>
 
                     <div class="campo-termos">
+
                         <input
                             type="checkbox"
                             id="aceiteTermos"
@@ -178,12 +247,22 @@
                             e a
                             <a href="#">Política de Privacidade</a>.
                         </label>
+
                     </div>
 
-                    <small class="erro-campo erro-termos" id="erroTermos"></small>
+                    <small
+                        class="erro-campo erro-termos"
+                        id="erroTermos"
+                    ></small>
 
-                    <button type="submit" id="botaoCadastrar">
-                        <span id="textoBotao">Criar minha conta</span>
+                    <button
+                        type="submit"
+                        id="botaoCadastrar"
+                    >
+                        <span id="textoBotao">
+                            Criar minha conta
+                        </span>
+
                         <span
                             id="carregandoBotao"
                             class="carregando"
@@ -204,7 +283,9 @@
 
                 <p class="possui-conta">
                     Já possui uma conta?
-                    <a href="login.html">Entrar</a>
+                    <a href="/login">
+                        Entrar
+                    </a>
                 </p>
 
             </div>
@@ -212,6 +293,6 @@
 
     </main>
 
-    <script src="js/cadastro.js"></script>
+    <script src="/js/cadastro.js"></script>
 </body>
 </html>
