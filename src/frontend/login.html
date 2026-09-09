@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
 
@@ -15,46 +16,94 @@
 
     <title>Entrar | Weblue</title>
 
-    <link rel="stylesheet" href="./css/login.css?v=1">
+    <link rel="stylesheet" href="/css/login.css?v=1">
 </head>
 
 <body>
+
     <main class="pagina-login">
 
-        <section class="painel-marca" aria-label="Apresentação da Weblue">
+        <section
+            class="painel-marca"
+            aria-label="Apresentação da Weblue"
+        >
+
             <div class="marca">
-                <span class="marca-simbolo" aria-hidden="true">W</span>
-                <span class="marca-nome">Weblue</span>
+                <span
+                    class="marca-simbolo"
+                    aria-hidden="true"
+                >
+                    W
+                </span>
+
+                <span class="marca-nome">
+                    Weblue
+                </span>
             </div>
 
-            <div class="apresentacao">
-                <p class="apresentacao-destaque">Sua beleza, do seu jeito</p>
 
-                <h1>Que bom ter você de volta!</h1>
+            <div class="apresentacao">
+
+                <p class="apresentacao-destaque">
+                    Sua beleza, do seu jeito
+                </p>
+
+                <h1>
+                    Que bom ter você de volta!
+                </h1>
 
                 <p>
                     Entre em sua conta para acessar seus produtos favoritos
                     e acompanhar seus pedidos.
                 </p>
+
             </div>
 
-            <div class="decoracao decoracao-um" aria-hidden="true"></div>
-            <div class="decoracao decoracao-dois" aria-hidden="true"></div>
+
+            <div
+                class="decoracao decoracao-um"
+                aria-hidden="true"
+            ></div>
+
+            <div
+                class="decoracao decoracao-dois"
+                aria-hidden="true"
+            ></div>
+
         </section>
 
+
         <section class="area-formulario">
+
             <div class="formulario-container">
 
                 <header class="formulario-cabecalho">
-                    <p class="etapa">Acesso do cliente</p>
-                    <h2>Entre na sua conta</h2>
-                    <p>Informe seu e-mail e sua senha.</p>
+
+                    <p class="etapa">
+                        Acesso do cliente
+                    </p>
+
+                    <h2>
+                        Entre na sua conta
+                    </h2>
+
+                    <p>
+                        Informe seu e-mail e sua senha.
+                    </p>
+
                 </header>
+
 
                 <form id="formLogin" novalidate>
 
+
+                    <!-- E-mail -->
+
                     <div class="campo">
-                        <label for="email">E-mail</label>
+
+                        <label for="email">
+                            E-mail
+                        </label>
 
                         <input
                             type="email"
@@ -65,13 +114,24 @@
                             required
                         >
 
-                        <small class="mensagem-erro" id="erroEmail"></small>
+                        <small
+                            class="mensagem-erro"
+                            id="erroEmail"
+                        ></small>
+
                     </div>
 
+
+                    <!-- Senha -->
+
                     <div class="campo">
-                        <label for="senha">Senha</label>
+
+                        <label for="senha">
+                            Senha
+                        </label>
 
                         <div class="campo-senha">
+
                             <input
                                 type="password"
                                 id="senha"
@@ -89,19 +149,44 @@
                             >
                                 Mostrar
                             </button>
+
                         </div>
 
-                        <small class="mensagem-erro" id="erroSenha"></small>
+                        <small
+                            class="mensagem-erro"
+                            id="erroSenha"
+                        ></small>
+
                     </div>
+
+
+                    <!-- Opções -->
 
                     <div class="opcoes-login">
+
                         <label class="lembrar">
-                            <input type="checkbox" id="lembrar">
+
+                            <input
+                                type="checkbox"
+                                id="lembrar"
+                            >
+
                             Lembrar de mim
+
                         </label>
 
-                        <a href="#" class="link">Esqueci minha senha</a>
+
+                        <a
+                            href="/recuperar-senha"
+                            class="link"
+                        >
+                            Esqueci minha senha
+                        </a>
+
                     </div>
+
+
+                    <!-- Mensagem -->
 
                     <div
                         id="mensagemLogin"
@@ -110,21 +195,41 @@
                         aria-live="polite"
                     ></div>
 
-                    <button type="submit" id="botaoEntrar" class="botao-entrar">
+
+                    <!-- Entrar -->
+
+                    <button
+                        type="submit"
+                        id="botaoEntrar"
+                        class="botao-entrar"
+                    >
                         Entrar
                     </button>
 
+
+                    <!-- Cadastro -->
+
                     <p class="cadastro-link">
+
                         Ainda não possui uma conta?
-                        <a href="cadastro.html">Cadastre-se</a>
+
+                        <a href="/cadastro">
+                            Cadastre-se
+                        </a>
+
                     </p>
 
                 </form>
+
             </div>
+
         </section>
 
     </main>
 
-    <script src="./js/login.js"></script>
+
+    <script src="/js/login.js"></script>
+
 </body>
+
 </html>
