@@ -13,6 +13,7 @@ from .routers.clientes import router as clientes_router
 from .routers.login import router as login_router
 from .routers.recuperacao_senha import router as recuperacao_senha_router
 
+
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
 
@@ -29,21 +30,29 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://127.0.0.1:5500",
-        "http://localhost:5500"
+        "http://localhost:5500",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000"
     ],
     allow_credentials=False,
-    allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Content-Type"],
+    allow_methods=["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
 )
 
+
+# ROTAS DA API
 app.include_router(clientes_router)
 app.include_router(login_router)
 app.include_router(recuperacao_senha_router)
 
+
+# ARQUIVOS ESTÁTICOS
 app.mount(
     "/css",
     StaticFiles(directory=FRONTEND_DIR / "css"),
@@ -57,17 +66,29 @@ app.mount(
 )
 
 
+# PÁGINAS DO SITE
+
 @app.get("/", include_in_schema=False)
 def pagina_cadastro():
     return FileResponse(FRONTEND_DIR / "cadastro.html")
+
 
 @app.get("/login", include_in_schema=False)
 def pagina_login():
     return FileResponse(FRONTEND_DIR / "login.html")
 
+
 @app.get("/recuperar-senha", include_in_schema=False)
 def pagina_recuperar_senha():
     return FileResponse(FRONTEND_DIR / "recuperar-senha.html")
+
+
+@app.get("/cliente", include_in_schema=False)
+def pagina_cliente():
+    return FileResponse(FRONTEND_DIR / "cliente.html")
+
+
+# INFORMAÇÕES
 
 @app.get("/api", tags=["Informações"])
 def informacoes_api():
@@ -77,9 +98,13 @@ def informacoes_api():
     }
 
 
+# MONITORAMENTO
+
 @app.get("/health", tags=["Monitoramento"])
 def verificar_saude():
-    return {"status": "online"}
+    return {
+        "status": "online"
+    }
 
 
 @app.get("/health/database", tags=["Monitoramento"])

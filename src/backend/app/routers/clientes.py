@@ -7,7 +7,11 @@ from sqlalchemy.orm import Session
 
 from ..database import get_database
 from ..models.cliente import Cliente
-from ..schemas.cliente import ClienteCriacao, ClienteResposta
+from ..schemas.cliente import (
+    ClienteCriacao,
+    ClienteResposta,
+    ClienteAtualizacao
+)
 from ..services.security import criar_hash_senha
 
 
@@ -70,3 +74,4 @@ def cadastrar_cliente(
         )
 
     return novo_cliente
+

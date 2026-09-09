@@ -136,3 +136,9 @@ class ClienteResposta(BaseModel):
     criado_em: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ClienteAtualizacao(BaseModel):
+    nome_completo: str | None = None
+    email: EmailStr | None = None
+    telefone: str | None = None

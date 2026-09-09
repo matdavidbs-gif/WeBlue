@@ -1,0 +1,427 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #111827;
+}
+
+.pagina-cliente {
+    min-height: 100vh;
+
+    display: grid;
+
+    grid-template-columns: 260px 1fr;
+}
+
+
+/* BARRA LATERAL */
+
+.barra-lateral {
+
+    background: linear-gradient(
+        180deg,
+        #123f86 0%,
+        #2865e8 100%
+    );
+
+    color: white;
+
+    padding: 32px 24px;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.marca {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 50px;
+
+    font-size: 22px;
+
+    font-weight: bold;
+}
+
+
+.marca-simbolo {
+
+    width: 42px;
+
+    height: 42px;
+
+    border-radius: 50%;
+
+    border: 2px solid white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: bold;
+}
+
+
+.menu {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    flex: 1;
+}
+
+
+.menu-item {
+
+    text-decoration: none;
+
+    color: rgba(255,255,255,.8);
+
+    padding: 14px 16px;
+
+    border-radius: 10px;
+
+    transition: .2s;
+}
+
+
+.menu-item:hover {
+
+    background: rgba(255,255,255,.12);
+
+    color: white;
+}
+
+
+.menu-item.ativo {
+
+    background: white;
+
+    color: #174c9c;
+
+    font-weight: bold;
+}
+
+
+.btn-sair {
+
+    border: 1px solid rgba(255,255,255,.5);
+
+    background: transparent;
+
+    color: white;
+
+    padding: 13px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+}
+
+
+.btn-sair:hover {
+
+    background: rgba(255,255,255,.1);
+}
+
+
+/* CONTEÚDO */
+
+.conteudo {
+
+    padding: 40px;
+
+    max-width: 1400px;
+}
+
+
+.cabecalho {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 35px;
+}
+
+
+.bem-vindo {
+
+    color: #6b7280;
+
+    margin-bottom: 5px;
+}
+
+
+.cabecalho h1 {
+
+    font-size: 30px;
+}
+
+
+.avatar {
+
+    width: 55px;
+
+    height: 55px;
+
+    border-radius: 50%;
+
+    background: #2865e8;
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 22px;
+
+    font-weight: bold;
+}
+
+
+/* RESUMO */
+
+.resumo {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 20px;
+
+    margin-bottom: 30px;
+}
+
+
+.cartao-resumo {
+
+    background: white;
+
+    border-radius: 14px;
+
+    padding: 24px;
+
+    box-shadow: 0 5px 18px rgba(0,0,0,.05);
+}
+
+
+.cartao-resumo span {
+
+    color: #6b7280;
+
+    display: block;
+
+    margin-bottom: 10px;
+}
+
+
+.cartao-resumo strong {
+
+    font-size: 28px;
+
+    display: block;
+
+    margin-bottom: 5px;
+}
+
+
+.cartao-resumo small {
+
+    color: #9ca3af;
+}
+
+
+.status-ativo {
+
+    color: #16a34a;
+}
+
+
+/* SEÇÕES */
+
+.dados-conta,
+.pedidos {
+
+    background: white;
+
+    padding: 28px;
+
+    border-radius: 14px;
+
+    margin-bottom: 25px;
+
+    box-shadow: 0 5px 18px rgba(0,0,0,.05);
+}
+
+
+.titulo-secao {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 25px;
+}
+
+
+.titulo-secao h2 {
+
+    margin-bottom: 5px;
+}
+
+
+.titulo-secao p {
+
+    color: #6b7280;
+
+    font-size: 14px;
+}
+
+
+.btn-editar {
+
+    background: #2865e8;
+
+    color: white;
+
+    border: none;
+
+    padding: 11px 18px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+
+.grade-dados {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+
+    gap: 25px;
+}
+
+
+.campo label {
+
+    display: block;
+
+    color: #6b7280;
+
+    font-size: 13px;
+
+    margin-bottom: 7px;
+}
+
+
+.campo p {
+
+    font-weight: 500;
+}
+
+
+/* PEDIDOS */
+
+.sem-pedidos {
+
+    text-align: center;
+
+    padding: 40px;
+}
+
+
+.icone-pedido {
+
+    font-size: 44px;
+
+    margin-bottom: 15px;
+}
+
+
+.sem-pedidos h3 {
+
+    margin-bottom: 8px;
+}
+
+
+.sem-pedidos p {
+
+    color: #6b7280;
+
+    margin-bottom: 20px;
+}
+
+
+.btn-comprar {
+
+    border: none;
+
+    background: #2865e8;
+
+    color: white;
+
+    padding: 12px 20px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+
+/* RESPONSIVO */
+
+@media (max-width: 900px) {
+
+    .pagina-cliente {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .barra-lateral {
+
+        display: none;
+
+    }
+
+    .resumo {
+
+        grid-template-columns: 1fr;
+
+    }
+
+    .grade-dados {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}

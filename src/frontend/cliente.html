@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Minha Conta | Weblue</title>
+
+    <link rel="stylesheet" href="css/cliente.css">
+</head>
+
+<body>
+
+<div class="pagina-cliente">
+
+    <aside class="barra-lateral">
+
+        <div class="marca">
+            <div class="marca-simbolo">W</div>
+            <span>Weblue</span>
+        </div>
+
+        <nav class="menu">
+
+            <a href="#" class="menu-item ativo">
+                Minha conta
+            </a>
+
+            <a href="#" class="menu-item">
+                Meus pedidos
+            </a>
+
+            <a href="#" class="menu-item">
+                Endereços
+            </a>
+
+            <a href="#" class="menu-item">
+                Favoritos
+            </a>
+
+        </nav>
+
+        <button id="btnSair" class="btn-sair">
+            Sair
+        </button>
+
+    </aside>
+
+
+    <main class="conteudo">
+
+        <header class="cabecalho">
+
+            <div>
+                <p class="bem-vindo">Bem-vindo(a) de volta!</p>
+
+                <h1 id="nomeCliente">
+                    Cliente Weblue
+                </h1>
+            </div>
+
+            <div class="avatar" id="avatarCliente">
+                W
+            </div>
+
+        </header>
+
+
+        <section class="resumo">
+
+            <div class="cartao-resumo">
+                <span>Pedidos</span>
+                <strong>0</strong>
+                <small>Pedidos realizados</small>
+            </div>
+
+            <div class="cartao-resumo">
+                <span>Favoritos</span>
+                <strong>0</strong>
+                <small>Produtos salvos</small>
+            </div>
+
+            <div class="cartao-resumo">
+                <span>Status</span>
+                <strong class="status-ativo">Ativa</strong>
+                <small>Sua conta está ativa</small>
+            </div>
+
+        </section>
+
+
+        <section class="dados-conta">
+
+            <div class="titulo-secao">
+
+                <div>
+                    <h2>Meus dados</h2>
+                    <p>Informações cadastradas na sua conta</p>
+                </div>
+
+                <button class="btn-editar">
+                    Editar dados
+                </button>
+
+            </div>
+
+
+            <div class="grade-dados">
+
+                <div class="campo">
+                    <label>Nome completo</label>
+                    <p id="clienteNome">---</p>
+                </div>
+
+                <div class="campo">
+                    <label>E-mail</label>
+                    <p id="clienteEmail">---</p>
+                </div>
+
+                <div class="campo">
+                    <label>CPF</label>
+                    <p id="clienteCpf">---</p>
+                </div>
+
+                <div class="campo">
+                    <label>Telefone</label>
+                    <p id="clienteTelefone">---</p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="pedidos">
+
+            <div class="titulo-secao">
+
+                <div>
+                    <h2>Pedidos recentes</h2>
+                    <p>Acompanhe suas últimas compras</p>
+                </div>
+
+            </div>
+
+            <div class="sem-pedidos">
+
+                <div class="icone-pedido">
+                    🛍️
+                </div>
+
+                <h3>Nenhum pedido encontrado</h3>
+
+                <p>
+                    Quando você realizar uma compra,
+                    seus pedidos aparecerão aqui.
+                </p>
+
+                <button class="btn-comprar">
+                    Começar a comprar
+                </button>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="js/cliente.js"></script>
+
+</body>
+</html>
