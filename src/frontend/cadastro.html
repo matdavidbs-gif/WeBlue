@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
 
@@ -15,16 +16,18 @@
 
     <title>Cadastre-se | Weblue</title>
 
-    <link rel="stylesheet" href="/css/cadastro.css">
+    <link rel="stylesheet" href="/css/cadastro.css?v=2">
 </head>
 
 <body>
+
     <main class="pagina-cadastro">
 
         <section
             class="painel-marca"
             aria-label="Apresentação da Weblue"
         >
+
             <div class="marca">
                 <span
                     class="marca-simbolo"
@@ -39,6 +42,7 @@
             </div>
 
             <div class="apresentacao">
+
                 <p class="apresentacao-destaque">
                     Sua beleza, do seu jeito
                 </p>
@@ -51,6 +55,7 @@
                     Crie sua conta para comprar seus produtos favoritos
                     e acompanhar seus pedidos.
                 </p>
+
             </div>
 
             <div
@@ -62,12 +67,16 @@
                 class="decoracao decoracao-dois"
                 aria-hidden="true"
             ></div>
+
         </section>
 
+
         <section class="area-formulario">
+
             <div class="formulario-container">
 
                 <header class="formulario-cabecalho">
+
                     <p class="etapa">
                         Cadastro de cliente
                     </p>
@@ -79,11 +88,16 @@
                     <p>
                         Preencha seus dados para entrar na Weblue.
                     </p>
+
                 </header>
+
 
                 <form id="formCadastro" novalidate>
 
+                    <!-- Nome -->
+
                     <div class="campo campo-completo">
+
                         <label for="nome">
                             Nome completo
                         </label>
@@ -103,9 +117,14 @@
                             class="erro-campo"
                             id="erroNome"
                         ></small>
+
                     </div>
 
+
+                    <!-- E-mail -->
+
                     <div class="campo campo-completo">
+
                         <label for="email">
                             E-mail
                         </label>
@@ -124,11 +143,16 @@
                             class="erro-campo"
                             id="erroEmail"
                         ></small>
+
                     </div>
+
+
+                    <!-- CPF e telefone -->
 
                     <div class="linha-campos">
 
                         <div class="campo">
+
                             <label for="cpf">
                                 CPF
                             </label>
@@ -149,9 +173,12 @@
                                 class="erro-campo"
                                 id="erroCpf"
                             ></small>
+
                         </div>
 
+
                         <div class="campo">
+
                             <label for="telefone">
                                 Telefone
                             </label>
@@ -172,13 +199,18 @@
                                 class="erro-campo"
                                 id="erroTelefone"
                             ></small>
+
                         </div>
 
                     </div>
 
+
+                    <!-- Senhas -->
+
                     <div class="linha-campos">
 
                         <div class="campo">
+
                             <label for="senha">
                                 Senha
                             </label>
@@ -205,9 +237,12 @@
                                 class="erro-campo"
                                 id="erroSenha"
                             ></small>
+
                         </div>
 
+
                         <div class="campo">
+
                             <label for="confirmarSenha">
                                 Confirmar senha
                             </label>
@@ -227,9 +262,13 @@
                                 class="erro-campo"
                                 id="erroConfirmarSenha"
                             ></small>
+
                         </div>
 
                     </div>
+
+
+                    <!-- Termos -->
 
                     <div class="campo-termos">
 
@@ -255,10 +294,14 @@
                         id="erroTermos"
                     ></small>
 
+
+                    <!-- Botão -->
+
                     <button
                         type="submit"
                         id="botaoCadastrar"
                     >
+
                         <span id="textoBotao">
                             Criar minha conta
                         </span>
@@ -269,7 +312,11 @@
                             hidden
                             aria-hidden="true"
                         ></span>
+
                     </button>
+
+
+                    <!-- Mensagem -->
 
                     <div
                         id="mensagemFormulario"
@@ -281,18 +328,25 @@
 
                 </form>
 
+
                 <p class="possui-conta">
                     Já possui uma conta?
+
                     <a href="/login">
                         Entrar
                     </a>
                 </p>
 
             </div>
+
         </section>
 
     </main>
 
-    <script src="/js/cadastro.js"></script>
+
+    <!-- v=2 força o navegador a carregar o JavaScript atualizado -->
+    <script src="/js/cadastro.js?v=2"></script>
+
 </body>
+
 </html>
