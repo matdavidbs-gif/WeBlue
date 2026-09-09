@@ -8,6 +8,10 @@ botoesMostrarSenha.forEach((botao) => {
         const alvo = botao.dataset.alvo;
         const campo = document.getElementById(alvo);
 
+        if (!campo) {
+            return;
+        }
+
         if (campo.type === "password") {
             campo.type = "text";
             botao.textContent = "Ocultar";
@@ -18,10 +22,12 @@ botoesMostrarSenha.forEach((botao) => {
     });
 });
 
+
 function exibirMensagem(texto, tipo) {
     mensagem.textContent = texto;
     mensagem.className = `mensagem ${tipo}`;
 }
+
 
 function senhaValida(senha) {
     return (
@@ -33,46 +39,83 @@ function senhaValida(senha) {
     );
 }
 
+
+function emailValido(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const email = document.getElementById("email").value.trim();
-    const novaSenha = document.getElementById("nova-senha").value;
-    const confirmarSenha = document.getElementById("confirmar-senha").value;
+    const campoEmail = document.getElementById("email");
+    const campoNovaSenha = document.getElementById("nova-senha");
+    const campoConfirmarSenha = document.getElementById("confirmar-senha");
+
+    const email = campoEmail.value.trim();
+    const novaSenha = campoNovaSenha.value;
+    const confirmarSenha = campoConfirmarSenha.value;
+
     const botao = form.querySelector(".botao-principal");
 
     mensagem.className = "mensagem";
     mensagem.textContent = "";
 
-    if (!email || !novaSenha || !confirmarSenha) {
-        exibirMensagem("Preencha todos os campos.", "erro");
-        return;
-    }
 
-    if (!senhaValida(novaSenha)) {
+    if (!email || !novaSenha || !confirmarSenha) {
         exibirMensagem(
-            "A nova senha não atende aos critérios de segurança.",
+            "Preencha todos os campos.",
             "erro"
         );
         return;
     }
 
-    if (novaSenha !== confirmarSenha) {
-        exibirMensagem("As senhas não coincidem.", "erro");
+
+    if (!emailValido(email)) {
+        exibirMensagem(
+            "Informe um e-mail válido.",
+            "erro"
+        );
+        campoEmail.focus();
         return;
     }
+
+
+    if (!senhaValida(novaSenha)) {
+        exibirMensagem(
+            "A nova senha deve ter pelo menos 8 caracteres, com letra maiúscula, minúscula, número e símbolo.",
+            "erro"
+        );
+        campoNovaSenha.focus();
+        return;
+    }
+
+
+    if (novaSenha !== confirmarSenha) {
+        exibirMensagem(
+            "As senhas não coincidem.",
+            "erro"
+        );
+        campoConfirmarSenha.focus();
+        return;
+    }
+
 
     botao.disabled = true;
     botao.textContent = "Alterando senha...";
 
+
     try {
+
         const resposta = await fetch(
-            "http://127.0.0.1:8000/auth/recuperar-senha",
+            "/auth/recuperar-senha",
             {
                 method: "POST",
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 body: JSON.stringify({
                     email: email,
                     nova_senha: novaSenha,
@@ -81,32 +124,56 @@ form.addEventListener("submit", async (event) => {
             }
         );
 
-        const dados = await resposta.json();
+
+        let dados = {};
+
+        try {
+            dados = await resposta.json();
+        } catch {
+            dados = {};
+        }
+
 
         if (!resposta.ok) {
             exibirMensagem(
-                dados.detail || "Não foi possível alterar a senha.",
+                dados.detail ||
+                "Não foi possível alterar a senha.",
                 "erro"
             );
+
             return;
         }
 
+
         exibirMensagem(
-            "Senha alterada com sucesso. Você já pode voltar ao login.",
+            "Senha alterada com sucesso. Redirecionando para o login...",
             "sucesso"
         );
 
         form.reset();
 
+
+        setTimeout(() => {
+            window.location.href = "/login";
+        }, 1500);
+
+
     } catch (erro) {
-        console.error(erro);
+
+        console.error(
+            "Erro ao recuperar senha:",
+            erro
+        );
 
         exibirMensagem(
-            "Não foi possível conectar ao servidor.",
+            "Não foi possível conectar à Weblue.",
             "erro"
         );
+
     } finally {
+
         botao.disabled = false;
         botao.textContent = "Alterar senha";
+
     }
 });
