@@ -11,7 +11,6 @@ const aceiteTermos = document.getElementById("aceiteTermos");
 const botaoCadastrar = document.getElementById("botaoCadastrar");
 const textoBotao = document.getElementById("textoBotao");
 const carregandoBotao = document.getElementById("carregandoBotao");
-
 const mensagemFormulario = document.getElementById("mensagemFormulario");
 
 
@@ -137,13 +136,10 @@ function validarFormulario() {
     const erroCpf = document.getElementById("erroCpf");
     const erroTelefone = document.getElementById("erroTelefone");
     const erroSenha = document.getElementById("erroSenha");
-
     const erroConfirmarSenha =
         document.getElementById("erroConfirmarSenha");
-
     const erroTermos =
         document.getElementById("erroTermos");
-
 
     limparErro(nome, erroNome);
     limparErro(email, erroEmail);
@@ -153,7 +149,6 @@ function validarFormulario() {
     limparErro(confirmarSenha, erroConfirmarSenha);
 
     erroTermos.textContent = "";
-
 
     const camposNome = nome.value
         .trim()
@@ -173,7 +168,6 @@ function validarFormulario() {
         valido = false;
     }
 
-
     const formatoEmail =
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -188,7 +182,6 @@ function validarFormulario() {
         valido = false;
     }
 
-
     if (!cpfValido(cpf.value)) {
         apresentarErro(
             cpf,
@@ -199,7 +192,6 @@ function validarFormulario() {
         primeiroCampoInvalido ??= cpf;
         valido = false;
     }
-
 
     const numerosTelefone =
         telefone.value.replace(/\D/g, "");
@@ -218,7 +210,6 @@ function validarFormulario() {
         valido = false;
     }
 
-
     const senhaForte =
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
 
@@ -232,7 +223,6 @@ function validarFormulario() {
         primeiroCampoInvalido ??= senha;
         valido = false;
     }
-
 
     if (
         confirmarSenha.value === "" ||
@@ -248,7 +238,6 @@ function validarFormulario() {
         valido = false;
     }
 
-
     if (!aceiteTermos.checked) {
         erroTermos.textContent =
             "Você precisa aceitar os termos e a política de privacidade.";
@@ -256,7 +245,6 @@ function validarFormulario() {
         primeiroCampoInvalido ??= aceiteTermos;
         valido = false;
     }
-
 
     if (!valido) {
         mostrarMensagem(
@@ -283,9 +271,7 @@ function ativarCarregamento() {
         "true"
     );
 
-    textoBotao.textContent =
-        "Criando conta...";
-
+    textoBotao.textContent = "Criando conta...";
     carregandoBotao.hidden = false;
 }
 
@@ -297,9 +283,7 @@ function desativarCarregamento() {
         "aria-busy"
     );
 
-    textoBotao.textContent =
-        "Criar minha conta";
-
+    textoBotao.textContent = "Criar minha conta";
     carregandoBotao.hidden = true;
 }
 
@@ -309,7 +293,6 @@ function desativarCarregamento() {
 formulario.addEventListener(
     "submit",
     async (evento) => {
-
         evento.preventDefault();
 
         esconderMensagem();
@@ -319,7 +302,6 @@ formulario.addEventListener(
         }
 
         ativarCarregamento();
-
 
         const dadosCliente = {
             nome_completo: nome.value.trim(),
@@ -331,58 +313,43 @@ formulario.addEventListener(
             aceitou_termos: aceiteTermos.checked
         };
 
-
         try {
-
             const resposta = await fetch(
                 "/clientes",
                 {
                     method: "POST",
-
                     headers: {
                         "Content-Type": "application/json"
                     },
-
                     body: JSON.stringify(dadosCliente)
                 }
             );
 
-
             const resultado = await resposta.json();
 
-
             if (!resposta.ok) {
-
                 let mensagemErro =
                     "Não foi possível concluir o cadastro.";
 
-                if (
-                    typeof resultado.detail === "string"
-                ) {
-                    mensagemErro =
-                        resultado.detail;
+                if (typeof resultado.detail === "string") {
+                    mensagemErro = resultado.detail;
                 }
 
                 throw new Error(mensagemErro);
             }
 
-
             formulario.reset();
-
 
             mostrarMensagem(
                 "sucesso",
                 `Conta criada com sucesso! Bem-vindo(a), ${resultado.nome_completo}.`
             );
 
-
             setTimeout(() => {
                 window.location.href = "/login";
             }, 1500);
 
-
         } catch (erro) {
-
             mostrarMensagem(
                 "erro",
                 erro.message ||
@@ -390,15 +357,13 @@ formulario.addEventListener(
             );
 
         } finally {
-
             desativarCarregamento();
-
         }
     }
 );
 
 
-/* Remove o erro quando o usuário começa a corrigir */
+/* Remove erros conforme o usuário corrige */
 
 const camposMonitorados = [
     [nome, "erroNome"],
@@ -412,21 +377,17 @@ const camposMonitorados = [
 
 camposMonitorados.forEach(
     ([campo, idErro]) => {
-
         campo.addEventListener(
             "input",
             () => {
-
                 limparErro(
                     campo,
                     document.getElementById(idErro)
                 );
 
                 esconderMensagem();
-
             }
         );
-
     }
 );
 
@@ -434,12 +395,10 @@ camposMonitorados.forEach(
 aceiteTermos.addEventListener(
     "change",
     () => {
-
         document
             .getElementById("erroTermos")
             .textContent = "";
 
         esconderMensagem();
-
     }
 );
