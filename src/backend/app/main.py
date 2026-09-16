@@ -9,13 +9,20 @@ from sqlalchemy import text
 
 from .database import Base, engine
 from .models.cliente import Cliente
+
+# Routers
 from .routers.clientes import router as clientes_router
 from .routers.login import router as login_router
 from .routers.recuperacao_senha import router as recuperacao_senha_router
+from .routers.perfil import router as perfil_router
 
 
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
+
+# =========================
+# INICIALIZAÇÃO
+# =========================
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,7 +38,10 @@ app = FastAPI(
 )
 
 
+# =========================
 # CORS
+# =========================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -54,13 +64,20 @@ app.add_middleware(
 )
 
 
+# =========================
 # ROTAS DA API
+# =========================
+
 app.include_router(clientes_router)
 app.include_router(login_router)
 app.include_router(recuperacao_senha_router)
+app.include_router(perfil_router)
 
 
+# =========================
 # ARQUIVOS ESTÁTICOS
+# =========================
+
 app.mount(
     "/css",
     StaticFiles(directory=FRONTEND_DIR / "css"),
@@ -78,20 +95,25 @@ app.mount(
 # PÁGINAS DO FRONTEND
 # =========================
 
-
 @app.get("/", include_in_schema=False)
 def pagina_inicial():
-    return FileResponse(FRONTEND_DIR / "cadastro.html")
+    return FileResponse(
+        FRONTEND_DIR / "cadastro.html"
+    )
 
 
 @app.get("/cadastro", include_in_schema=False)
 def pagina_cadastro():
-    return FileResponse(FRONTEND_DIR / "cadastro.html")
+    return FileResponse(
+        FRONTEND_DIR / "cadastro.html"
+    )
 
 
 @app.get("/login", include_in_schema=False)
 def pagina_login():
-    return FileResponse(FRONTEND_DIR / "login.html")
+    return FileResponse(
+        FRONTEND_DIR / "login.html"
+    )
 
 
 @app.get("/recuperar-senha", include_in_schema=False)
@@ -103,15 +125,19 @@ def pagina_recuperar_senha():
 
 @app.get("/cliente", include_in_schema=False)
 def pagina_cliente():
-    return FileResponse(FRONTEND_DIR / "cliente.html")
+    return FileResponse(
+        FRONTEND_DIR / "cliente.html"
+    )
 
 
 # =========================
 # INFORMAÇÕES DA API
 # =========================
 
-
-@app.get("/api", tags=["Informações"])
+@app.get(
+    "/api",
+    tags=["Informações"]
+)
 def informacoes_api():
     return {
         "sistema": "Weblue",
@@ -123,19 +149,26 @@ def informacoes_api():
 # MONITORAMENTO
 # =========================
 
-
-@app.get("/health", tags=["Monitoramento"])
+@app.get(
+    "/health",
+    tags=["Monitoramento"]
+)
 def verificar_saude():
     return {
         "status": "online"
     }
 
 
-@app.get("/health/database", tags=["Monitoramento"])
+@app.get(
+    "/health/database",
+    tags=["Monitoramento"]
+)
 def verificar_banco():
     try:
         with engine.connect() as connection:
-            connection.execute(text("SELECT 1"))
+            connection.execute(
+                text("SELECT 1")
+            )
 
         return {
             "status": "online",

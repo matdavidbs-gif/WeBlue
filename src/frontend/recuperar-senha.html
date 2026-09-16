@@ -1,64 +1,172 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Recuperar senha | Weblue</title>
-    <link rel="stylesheet" href="/css/recuperar-senha.css">
+
+    <link
+        rel="stylesheet"
+        href="/css/recuperar-senha.css"
+    >
 </head>
+
 <body>
 
     <main class="pagina-recuperacao">
 
+        <!-- ============================= -->
+        <!-- PAINEL DA MARCA -->
+        <!-- ============================= -->
+
         <section class="painel-marca">
+
             <div class="logo">
-                <span class="logo-icone">W</span>
-                <span class="logo-texto">Weblue</span>
+
+                <span class="logo-icone">
+                    W
+                </span>
+
+                <span class="logo-texto">
+                    Weblue
+                </span>
+
             </div>
+
 
             <div class="conteudo-marca">
-                <p class="subtitulo">SUA BELEZA, DO SEU JEITO</p>
-                <h1>Recupere o acesso à sua conta.</h1>
-                <p>
-                    Defina uma nova senha para continuar aproveitando
-                    sua experiência na Weblue.
+
+                <p class="subtitulo">
+                    SUA BELEZA, DO SEU JEITO
                 </p>
+
+                <h1>
+                    Recupere o acesso à sua conta.
+                </h1>
+
+                <p>
+                    Confirme sua identidade e defina
+                    uma nova senha para continuar
+                    aproveitando sua experiência na Weblue.
+                </p>
+
             </div>
+
         </section>
 
+
+        <!-- ============================= -->
+        <!-- FORMULÁRIO -->
+        <!-- ============================= -->
+
         <section class="painel-formulario">
+
             <div class="formulario-container">
 
-                <p class="identificacao">RECUPERAÇÃO DE ACESSO</p>
+                <p class="identificacao">
+                    RECUPERAÇÃO DE ACESSO
+                </p>
 
-                <h2>Crie uma nova senha</h2>
+                <h2>
+                    Redefina sua senha
+                </h2>
 
                 <p class="descricao">
-                    Informe o e-mail cadastrado e escolha uma nova senha.
+                    Informe seu e-mail, gere um token
+                    de recuperação e depois escolha
+                    sua nova senha.
                 </p>
+
 
                 <form id="form-recuperacao">
 
+
+                    <!-- ===================== -->
+                    <!-- E-MAIL -->
+                    <!-- ===================== -->
+
                     <div class="campo">
-                        <label for="email">E-mail</label>
+
+                        <label for="email">
+                            E-mail
+                        </label>
+
                         <input
                             type="email"
                             id="email"
                             placeholder="seuemail@exemplo.com"
+                            autocomplete="email"
                             required
                         >
+
                     </div>
 
+
+                    <!-- ===================== -->
+                    <!-- GERAR TOKEN -->
+                    <!-- ===================== -->
+
+                    <button
+                        type="button"
+                        id="solicitar-token"
+                        class="botao-token"
+                    >
+                        Gerar token de recuperação
+                    </button>
+
+
+                    <!-- ===================== -->
+                    <!-- TOKEN -->
+                    <!-- ===================== -->
+
                     <div class="campo">
-                        <label for="nova-senha">Nova senha</label>
+
+                        <label for="token">
+                            Token de recuperação
+                        </label>
+
+                        <input
+                            type="text"
+                            id="token"
+                            placeholder="O token aparecerá aqui"
+                            autocomplete="off"
+                            required
+                        >
+
+                        <small>
+                            O token é válido por 15 minutos.
+                        </small>
+
+                    </div>
+
+
+                    <!-- ===================== -->
+                    <!-- NOVA SENHA -->
+                    <!-- ===================== -->
+
+                    <div class="campo">
+
+                        <label for="nova-senha">
+                            Nova senha
+                        </label>
+
 
                         <div class="campo-senha">
+
                             <input
                                 type="password"
                                 id="nova-senha"
                                 placeholder="Digite a nova senha"
+                                autocomplete="new-password"
                                 required
                             >
+
 
                             <button
                                 type="button"
@@ -67,19 +175,33 @@
                             >
                                 Mostrar
                             </button>
+
                         </div>
+
                     </div>
 
+
+                    <!-- ===================== -->
+                    <!-- CONFIRMAR SENHA -->
+                    <!-- ===================== -->
+
                     <div class="campo">
-                        <label for="confirmar-senha">Confirmar nova senha</label>
+
+                        <label for="confirmar-senha">
+                            Confirmar nova senha
+                        </label>
+
 
                         <div class="campo-senha">
+
                             <input
                                 type="password"
                                 id="confirmar-senha"
                                 placeholder="Digite novamente a senha"
+                                autocomplete="new-password"
                                 required
                             >
+
 
                             <button
                                 type="button"
@@ -88,36 +210,91 @@
                             >
                                 Mostrar
                             </button>
+
                         </div>
+
                     </div>
+
+
+                    <!-- ===================== -->
+                    <!-- REGRAS DA SENHA -->
+                    <!-- ===================== -->
 
                     <div class="criterios">
-                        <p>A senha deve possuir:</p>
+
+                        <p>
+                            A senha deve possuir:
+                        </p>
+
                         <ul>
-                            <li>pelo menos 8 caracteres;</li>
-                            <li>uma letra maiúscula;</li>
-                            <li>uma letra minúscula;</li>
-                            <li>um número;</li>
-                            <li>um caractere especial.</li>
+
+                            <li>
+                                pelo menos 8 caracteres;
+                            </li>
+
+                            <li>
+                                uma letra maiúscula;
+                            </li>
+
+                            <li>
+                                uma letra minúscula;
+                            </li>
+
+                            <li>
+                                um número;
+                            </li>
+
+                            <li>
+                                um caractere especial.
+                            </li>
+
                         </ul>
+
                     </div>
 
-                    <div id="mensagem" class="mensagem"></div>
 
-                    <button type="submit" class="botao-principal">
+                    <!-- ===================== -->
+                    <!-- MENSAGENS -->
+                    <!-- ===================== -->
+
+                    <div
+                        id="mensagem"
+                        class="mensagem"
+                        aria-live="polite"
+                    ></div>
+
+
+                    <!-- ===================== -->
+                    <!-- ALTERAR SENHA -->
+                    <!-- ===================== -->
+
+                    <button
+                        type="submit"
+                        class="botao-principal"
+                    >
                         Alterar senha
                     </button>
 
-                    <a href="/login" class="voltar-login">
+
+                    <a
+                        href="/login"
+                        class="voltar-login"
+                    >
                         Voltar para o login
                     </a>
 
+
                 </form>
+
             </div>
+
         </section>
 
     </main>
 
+
     <script src="/js/recuperar-senha.js"></script>
+
 </body>
+
 </html>

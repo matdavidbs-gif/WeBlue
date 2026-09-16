@@ -3,6 +3,9 @@ const formLogin = document.getElementById("formLogin");
 const campoEmail = document.getElementById("email");
 const campoSenha = document.getElementById("senha");
 
+// Checkbox "Lembrar de mim"
+const campoLembrar = document.getElementById("lembrar");
+
 const erroEmail = document.getElementById("erroEmail");
 const erroSenha = document.getElementById("erroSenha");
 
@@ -12,10 +15,17 @@ const botaoEntrar = document.getElementById("botaoEntrar");
 const botaoMostrarSenha = document.getElementById("botaoMostrarSenha");
 
 
+// ================================
+// MOSTRAR / OCULTAR SENHA
+// ================================
+
 botaoMostrarSenha.addEventListener("click", () => {
+
     const senhaEstaOculta = campoSenha.type === "password";
 
-    campoSenha.type = senhaEstaOculta ? "text" : "password";
+    campoSenha.type = senhaEstaOculta
+        ? "text"
+        : "password";
 
     botaoMostrarSenha.textContent = senhaEstaOculta
         ? "Ocultar"
@@ -23,12 +33,22 @@ botaoMostrarSenha.addEventListener("click", () => {
 });
 
 
+// ================================
+// VALIDAR E-MAIL
+// ================================
+
 function emailValido(email) {
+
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 
+// ================================
+// LIMPAR MENSAGENS
+// ================================
+
 function limparMensagens() {
+
     erroEmail.textContent = "";
     erroSenha.textContent = "";
 
@@ -40,33 +60,53 @@ function limparMensagens() {
 }
 
 
+// ================================
+// VALIDAR FORMULÁRIO
+// ================================
+
 function validarFormulario() {
+
     let formularioValido = true;
 
     const email = campoEmail.value.trim();
     const senha = campoSenha.value;
 
     if (email === "") {
-        erroEmail.textContent = "Informe seu e-mail.";
+
+        erroEmail.textContent =
+            "Informe seu e-mail.";
+
         campoEmail.classList.add("invalido");
+
         formularioValido = false;
 
     } else if (!emailValido(email)) {
-        erroEmail.textContent = "Informe um e-mail válido.";
+
+        erroEmail.textContent =
+            "Informe um e-mail válido.";
+
         campoEmail.classList.add("invalido");
+
         formularioValido = false;
     }
 
+
     if (senha === "") {
-        erroSenha.textContent = "Informe sua senha.";
+
+        erroSenha.textContent =
+            "Informe sua senha.";
+
         campoSenha.classList.add("invalido");
+
         formularioValido = false;
 
     } else if (senha.length < 8) {
+
         erroSenha.textContent =
             "A senha deve possuir pelo menos 8 caracteres.";
 
         campoSenha.classList.add("invalido");
+
         formularioValido = false;
     }
 
@@ -74,12 +114,18 @@ function validarFormulario() {
 }
 
 
+// ================================
+// REALIZAR LOGIN
+// ================================
+
 formLogin.addEventListener("submit", async (evento) => {
+
     evento.preventDefault();
 
     limparMensagens();
 
     if (!validarFormulario()) {
+
         mensagemLogin.textContent =
             "Verifique os campos destacados.";
 
@@ -89,10 +135,19 @@ formLogin.addEventListener("submit", async (evento) => {
         return;
     }
 
+
     botaoEntrar.disabled = true;
     botaoEntrar.textContent = "Entrando...";
 
+
     try {
+
+        // Verifica se o usuário marcou
+        // "Lembrar de mim"
+        const lembrar = campoLembrar
+            ? campoLembrar.checked
+            : false;
+
 
         const resposta = await fetch(
             "/auth/login",
@@ -104,20 +159,28 @@ formLogin.addEventListener("submit", async (evento) => {
                 },
 
                 body: JSON.stringify({
+
                     email: campoEmail.value.trim(),
-                    senha: campoSenha.value
+
+                    senha: campoSenha.value,
+
+                    lembrar: lembrar
                 })
             }
         );
 
+
         const resultado = await resposta.json();
 
+
         if (!resposta.ok) {
+
             throw new Error(
                 resultado.detail ||
                 "Não foi possível realizar o login."
             );
         }
+
 
         mensagemLogin.textContent =
             `Login realizado com sucesso. Bem-vindo(a), ${resultado.cliente.nome_completo}!`;
@@ -126,14 +189,57 @@ formLogin.addEventListener("submit", async (evento) => {
             "mensagem-login sucesso";
 
 
-        sessionStorage.setItem(
-            "clienteWeblue",
-            JSON.stringify(resultado.cliente)
-        );
+        // ================================
+        // LIMPAR SESSÕES ANTIGAS
+        // ================================
 
+        localStorage.removeItem("clienteWeblue");
+        localStorage.removeItem("tokenWeblue");
+
+        sessionStorage.removeItem("clienteWeblue");
+        sessionStorage.removeItem("tokenWeblue");
+
+
+        // ================================
+        // LEMBRAR DE MIM
+        // ================================
+
+        if (lembrar) {
+
+            // Sessão persistente
+            localStorage.setItem(
+                "clienteWeblue",
+                JSON.stringify(resultado.cliente)
+            );
+
+            localStorage.setItem(
+                "tokenWeblue",
+                resultado.access_token
+            );
+
+        } else {
+
+            // Sessão temporária
+            sessionStorage.setItem(
+                "clienteWeblue",
+                JSON.stringify(resultado.cliente)
+            );
+
+            sessionStorage.setItem(
+                "tokenWeblue",
+                resultado.access_token
+            );
+        }
+
+
+        // ================================
+        // REDIRECIONAR
+        // ================================
 
         setTimeout(() => {
+
             window.location.href = "/cliente";
+
         }, 800);
 
 
@@ -151,18 +257,25 @@ formLogin.addEventListener("submit", async (evento) => {
 
         botaoEntrar.disabled = false;
         botaoEntrar.textContent = "Entrar";
-
     }
 });
 
 
+// ================================
+// LIMPAR ERROS AO DIGITAR
+// ================================
+
 campoEmail.addEventListener("input", () => {
+
     erroEmail.textContent = "";
+
     campoEmail.classList.remove("invalido");
 });
 
 
 campoSenha.addEventListener("input", () => {
+
     erroSenha.textContent = "";
+
     campoSenha.classList.remove("invalido");
 });

@@ -1,26 +1,9 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
 
-    // Recupera os dados do cliente salvos durante o login
-    const clienteSalvo = sessionStorage.getItem("clienteWeblue");
+    // ================================
+    // ELEMENTOS DA PÁGINA
+    // ================================
 
-    // Se não houver cliente logado, volta para a página de login
-    if (!clienteSalvo) {
-        window.location.href = "/login";
-        return;
-    }
-
-    let cliente;
-
-    try {
-        cliente = JSON.parse(clienteSalvo);
-    } catch (erro) {
-        sessionStorage.removeItem("clienteWeblue");
-        window.location.href = "/login";
-        return;
-    }
-
-
-    // Elementos da página
     const nomeCliente = document.getElementById("nomeCliente");
     const clienteNome = document.getElementById("clienteNome");
     const clienteEmail = document.getElementById("clienteEmail");
@@ -30,65 +13,197 @@ document.addEventListener("DOMContentLoaded", () => {
     const btnSair = document.getElementById("btnSair");
 
 
-    // Preenche os dados do cliente
-    if (nomeCliente) {
-        nomeCliente.textContent =
-            cliente.nome_completo || "Cliente Weblue";
-    }
+    // ================================
+    // PROCURAR TOKEN
+    // ================================
 
-    if (clienteNome) {
-        clienteNome.textContent =
-            cliente.nome_completo || "Não informado";
-    }
+    // Primeiro procura no sessionStorage.
+    // Caso não encontre, procura no localStorage.
 
-    if (clienteEmail) {
-        clienteEmail.textContent =
-            cliente.email || "Não informado";
-    }
+    const token =
+        sessionStorage.getItem("tokenWeblue") ||
+        localStorage.getItem("tokenWeblue");
 
-    if (clienteCpf) {
-        clienteCpf.textContent =
-            cliente.cpf || "Não informado";
-    }
 
-    if (clienteTelefone) {
-        clienteTelefone.textContent =
-            cliente.telefone || "Não informado";
+    // Se não existir token, não existe sessão autenticada.
+    if (!token) {
+
+        limparSessao();
+
+        window.location.href = "/login";
+
+        return;
     }
 
 
-    // Coloca a primeira letra do nome no avatar
-    if (avatarCliente) {
+    // ================================
+    // LIMPAR SESSÃO
+    // ================================
 
-        if (cliente.nome_completo) {
+    function limparSessao() {
 
-            avatarCliente.textContent =
-                cliente.nome_completo
-                    .trim()
-                    .charAt(0)
-                    .toUpperCase();
+        sessionStorage.removeItem("clienteWeblue");
+        sessionStorage.removeItem("tokenWeblue");
+
+        localStorage.removeItem("clienteWeblue");
+        localStorage.removeItem("tokenWeblue");
+    }
+
+
+    // ================================
+    // CARREGAR PERFIL
+    // ================================
+
+    try {
+
+        const resposta = await fetch(
+            "/perfil",
+            {
+                method: "GET",
+
+                headers: {
+
+                    "Accept": "application/json",
+
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+
+        // Token inválido ou expirado
+        if (resposta.status === 401) {
+
+            limparSessao();
+
+            window.location.href = "/login";
+
+            return;
+        }
+
+
+        if (!resposta.ok) {
+
+            throw new Error(
+                "Não foi possível carregar os dados do perfil."
+            );
+        }
+
+
+        // Dados vindos diretamente do backend
+        const cliente = await resposta.json();
+
+
+        // ================================
+        // ATUALIZAR DADOS SALVOS
+        // ================================
+
+        if (sessionStorage.getItem("tokenWeblue")) {
+
+            sessionStorage.setItem(
+                "clienteWeblue",
+                JSON.stringify(cliente)
+            );
 
         } else {
 
-            avatarCliente.textContent = "W";
-
+            localStorage.setItem(
+                "clienteWeblue",
+                JSON.stringify(cliente)
+            );
         }
+
+
+        // ================================
+        // PREENCHER A PÁGINA
+        // ================================
+
+        if (nomeCliente) {
+
+            nomeCliente.textContent =
+                cliente.nome_completo ||
+                "Cliente Weblue";
+        }
+
+
+        if (clienteNome) {
+
+            clienteNome.textContent =
+                cliente.nome_completo ||
+                "Não informado";
+        }
+
+
+        if (clienteEmail) {
+
+            clienteEmail.textContent =
+                cliente.email ||
+                "Não informado";
+        }
+
+
+        if (clienteCpf) {
+
+            clienteCpf.textContent =
+                cliente.cpf ||
+                "Não informado";
+        }
+
+
+        if (clienteTelefone) {
+
+            clienteTelefone.textContent =
+                cliente.telefone ||
+                "Não informado";
+        }
+
+
+        // ================================
+        // AVATAR
+        // ================================
+
+        if (avatarCliente) {
+
+            if (cliente.nome_completo) {
+
+                avatarCliente.textContent =
+                    cliente.nome_completo
+                        .trim()
+                        .charAt(0)
+                        .toUpperCase();
+
+            } else {
+
+                avatarCliente.textContent = "W";
+            }
+        }
+
+
+    } catch (erro) {
+
+        console.error(
+            "Erro ao carregar perfil:",
+            erro
+        );
+
+        alert(
+            "Não foi possível carregar os dados da sua conta."
+        );
     }
 
 
-    // Botão sair
+    // ================================
+    // BOTÃO SAIR
+    // ================================
+
     if (btnSair) {
 
         btnSair.addEventListener("click", () => {
 
-            // Remove os dados da sessão
-            sessionStorage.removeItem("clienteWeblue");
+            limparSessao();
 
-            // Retorna para o login
             window.location.href = "/login";
-
         });
-
     }
 
 });
