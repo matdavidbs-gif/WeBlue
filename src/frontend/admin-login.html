@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <!-- =====================================================
+         CONFIGURAÇÕES BÁSICAS
+    ====================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin | Weblue</title>
+
+
+    <!-- =====================================================
+         CSS DA PÁGINA
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="/css/admin-login.css"
+    >
+</head>
+
+
+<body>
+
+    <!-- =====================================================
+         PÁGINA DE LOGIN ADMINISTRATIVO
+    ====================================================== -->
+
+    <main class="admin-login-page">
+
+
+        <!-- =================================================
+             ÁREA ESQUERDA
+        ================================================== -->
+
+        <section class="admin-brand">
+
+            <div class="admin-brand-content">
+
+                <!-- LOGO -->
+
+                <a
+                    href="/home.html"
+                    class="logo"
+                    aria-label="Voltar para Weblue"
+                >
+
+                    <span class="logo-icon">
+                        W
+                    </span>
+
+                    <span class="logo-text">
+                        Weblue
+                    </span>
+
+                </a>
+
+
+                <!-- TEXTO -->
+
+                <div class="brand-message">
+
+                    <span class="brand-label">
+                        WEBLUE ADMIN
+                    </span>
+
+                    <h1>
+                        Gerencie sua loja
+                        <span>com segurança.</span>
+                    </h1>
+
+                    <p>
+                        Acesse o painel administrativo para
+                        gerenciar produtos e informações da Weblue.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             ÁREA DIREITA
+        ================================================== -->
+
+        <section class="admin-access">
+
+            <div class="login-container">
+
+
+                <!-- CABEÇALHO -->
+
+                <div class="login-header">
+
+                    <div class="admin-icon">
+                        W
+                    </div>
+
+                    <h2>
+                        Acesso administrativo
+                    </h2>
+
+                    <p>
+                        Entre com suas credenciais de administrador.
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     MENSAGEM DE RETORNO
+                ================================================== -->
+
+                <div
+                    id="mensagemLogin"
+                    class="login-message"
+                    role="alert"
+                    aria-live="polite"
+                ></div>
+
+
+                <!-- =================================================
+                     FORMULÁRIO
+                ================================================== -->
+
+                <form
+                    id="formAdminLogin"
+                    class="login-form"
+                    novalidate
+                >
+
+
+                    <!-- E-MAIL -->
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            E-mail
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="admin@weblue.com"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+
+                    <!-- SENHA -->
+
+                    <div class="form-group">
+
+                        <label for="senha">
+                            Senha
+                        </label>
+
+                        <div class="password-container">
+
+                            <input
+                                type="password"
+                                id="senha"
+                                name="senha"
+                                placeholder="Digite sua senha"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="btnMostrarSenha"
+                                class="show-password"
+                                aria-label="Mostrar senha"
+                            >
+                                Mostrar
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         BOTÃO ENTRAR
+                    ================================================== -->
+
+                    <button
+                        type="submit"
+                        id="btnEntrar"
+                        class="login-button"
+                    >
+
+                        <span id="textoBtnEntrar">
+                            Entrar no painel
+                        </span>
+
+                    </button>
+
+                </form>
+
+
+                <!-- =================================================
+                     VOLTAR PARA LOJA
+                ================================================== -->
+
+                <div class="back-store">
+
+                    <a href="/home.html">
+                        ← Voltar para a loja
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script
+        src="/js/admin-login.js"
+        defer
+    ></script>
+
+</body>
+
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <!-- =====================================================
+         CONFIGURAÇÕES DA PÁGINA
+    ====================================================== -->
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Weblue | Beleza e Cosméticos</title>
+
+
+    <!-- =====================================================
+         CSS DA HOME
+    ====================================================== -->
+
+    <!--
+        O arquivo home.css está dentro da pasta:
+
+        frontend/css/home.css
+
+        Como home.html está dentro de frontend,
+        utilizamos:
+
+        /css/home.css
+    -->
+    <link
+        rel="stylesheet"
+        href="/css/home.css"
+    >
+
+</head>
+
+
+<body>
+
+
+    <!-- =====================================================
+         CABEÇALHO
+    ====================================================== -->
+
+    <header class="cabecalho">
+
+        <div class="cabecalho-container">
+
+
+            <!-- =================================================
+                 LOGO
+            ================================================== -->
+
+            <a
+                href="/home.html"
+                class="logo"
+                aria-label="Página inicial da Weblue"
+            >
+
+                <span class="logo-nome">
+                    WEBLUE
+                </span>
+
+                <span class="logo-subtitulo">
+                    BEAUTY
+                </span>
+
+            </a>
+
+
+            <!-- =================================================
+                 MENU PRINCIPAL
+            ================================================== -->
+
+            <nav
+                class="menu"
+                aria-label="Menu principal"
+            >
+
+                <a
+                    href="/home.html"
+                    class="menu-link ativo"
+                >
+                    Produtos
+                </a>
+
+                <a
+                    href="#categorias"
+                    class="menu-link"
+                >
+                    Categorias
+                </a>
+
+                <a
+                    href="#produtos"
+                    class="menu-link"
+                >
+                    Ofertas
+                </a>
+
+                <a
+                    href="#produtos"
+                    class="menu-link"
+                >
+                    Novidades
+                </a>
+
+            </nav>
+
+
+            <!-- =================================================
+                 PESQUISA
+            ================================================== -->
+
+            <form
+                id="formBusca"
+                class="busca"
+            >
+
+                <input
+                    id="campoBusca"
+                    type="search"
+                    placeholder="Busque por produtos, marcas..."
+                    autocomplete="off"
+                    aria-label="Pesquisar produtos"
+                >
+
+                <button
+                    class="botao-busca"
+                    type="submit"
+                    aria-label="Pesquisar"
+                >
+                    🔍
+                </button>
+
+            </form>
+
+
+            <!-- =================================================
+                 AÇÕES DO USUÁRIO
+            ================================================== -->
+
+            <div class="acoes">
+
+
+                <!-- MINHA CONTA -->
+
+                <a
+                    href="/cliente"
+                    class="acao"
+                    aria-label="Minha conta"
+                    title="Minha conta"
+                >
+                    ♟
+                </a>
+
+
+                <!-- FAVORITOS -->
+
+                <button
+                    type="button"
+                    class="acao"
+                    aria-label="Favoritos"
+                    title="Favoritos"
+                >
+                    ♡
+                </button>
+
+
+                <!-- CARRINHO -->
+
+                <button
+                    type="button"
+                    class="acao"
+                    aria-label="Carrinho"
+                    title="Carrinho"
+                >
+
+                    🛒
+
+                    <span
+                        id="contadorCarrinho"
+                        class="contador-carrinho"
+                    >
+                        0
+                    </span>
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         CONTEÚDO PRINCIPAL
+    ====================================================== -->
+
+    <main>
+
+
+        <!-- =================================================
+             HERO
+        ================================================== -->
+
+        <section class="hero">
+
+
+            <!-- =================================================
+                 TEXTO DO HERO
+            ================================================== -->
+
+            <div class="hero-conteudo">
+
+                <span class="hero-tag">
+                    BELEZA DO SEU JEITO
+                </span>
+
+
+                <h1>
+
+                    Sua beleza.
+
+                    <span>
+                        Sua essência.
+                    </span>
+
+                </h1>
+
+
+                <p>
+                    Descubra produtos selecionados para cuidar
+                    de você todos os dias.
+                </p>
+
+
+                <a
+                    href="#produtos"
+                    class="botao-principal"
+                >
+
+                    Ver produtos
+
+                    <span>
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+
+            <!-- =================================================
+                 IMAGEM DO HERO
+            ================================================== -->
+
+            <div class="hero-arte">
+
+                <!--
+                    IMPORTANTE:
+
+                    Mantemos a imagem original sem usar
+                    object-fit: cover.
+
+                    O CSS atual já está configurado para evitar
+                    cortes e zoom excessivo.
+                -->
+
+                <img
+                    src="/img/hero-weblue.png"
+                    alt="Produtos de beleza Weblue"
+                    class="hero-imagem"
+                >
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             CATEGORIAS
+        ================================================== -->
+
+        <section
+            id="categorias"
+            class="secao-categorias"
+        >
+
+
+            <!-- =================================================
+                 TÍTULO
+            ================================================== -->
+
+            <div class="titulo-secao">
+
+                <div>
+
+                    <span class="titulo-pequeno">
+                        EXPLORE
+                    </span>
+
+                    <h2>
+                        Compre por categoria
+                    </h2>
+
+                    <p>
+                        Encontre produtos para cada momento
+                        da sua rotina.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="#produtos"
+                    class="ver-todas"
+                >
+                    Ver todos →
+                </a>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CARDS DAS CATEGORIAS
+            ================================================== -->
+
+            <div class="categorias">
+
+
+                <!-- SKINCARE -->
+
+                <button
+                    type="button"
+                    class="categoria"
+                    data-categoria="Skincare"
+                >
+
+                    <span class="categoria-imagem">
+                        ✨
+                    </span>
+
+                    <span>
+                        Skincare
+                    </span>
+
+                </button>
+
+
+                <!-- MAQUIAGEM -->
+
+                <button
+                    type="button"
+                    class="categoria"
+                    data-categoria="Maquiagem"
+                >
+
+                    <span class="categoria-imagem">
+                        💄
+                    </span>
+
+                    <span>
+                        Maquiagem
+                    </span>
+
+                </button>
+
+
+                <!-- CABELOS -->
+
+                <button
+                    type="button"
+                    class="categoria"
+                    data-categoria="Cabelos"
+                >
+
+                    <span class="categoria-imagem">
+                        ✦
+                    </span>
+
+                    <span>
+                        Cabelos
+                    </span>
+
+                </button>
+
+
+                <!-- PERFUMES -->
+
+                <button
+                    type="button"
+                    class="categoria"
+                    data-categoria="Perfumes"
+                >
+
+                    <span class="categoria-imagem">
+                        ♡
+                    </span>
+
+                    <span>
+                        Perfumes
+                    </span>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PRODUTOS
+        ================================================== -->
+
+        <section
+            id="produtos"
+            class="secao-produtos"
+        >
+
+
+            <!-- =================================================
+                 TÍTULO DA ÁREA DE PRODUTOS
+            ================================================== -->
+
+            <div class="titulo-secao">
+
+                <div>
+
+                    <span class="titulo-pequeno">
+                        WEBLUE
+                    </span>
+
+                    <h2>
+                        Nossos produtos
+                    </h2>
+
+                    <p>
+                        Conheça os produtos disponíveis
+                        no catálogo Weblue.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 MENSAGENS DA API
+            ================================================== -->
+
+            <!--
+                O JavaScript utiliza este elemento para mostrar:
+
+                "Carregando produtos..."
+
+                "Nenhum produto encontrado."
+
+                mensagens de erro etc.
+            -->
+
+            <p
+                id="mensagemProdutos"
+                class="mensagem-produtos"
+            >
+                Carregando produtos...
+            </p>
+
+
+
+            <!-- =================================================
+                 LISTA DOS PRODUTOS
+            ================================================== -->
+
+            <!--
+                Não colocamos produtos manualmente aqui.
+
+                O home.js fará:
+
+                GET /produtos
+
+                e criará os cards automaticamente.
+            -->
+
+            <div
+                id="listaProdutos"
+                class="lista-produtos"
+            >
+            </div>
+
+            
+
+
+        </section>
+
+        
+
+
+    </main>
+
+    <!-- =====================================================
+         RODAPÉ
+    ====================================================== -->
+
+    <footer class="rodape">
+
+        <div class="rodape-container">
+
+            <!-- MARCA -->
+            <div class="rodape-marca">
+
+                <span class="rodape-logo">
+                    WEBLUE
+                </span>
+
+                <span class="rodape-subtitulo">
+                    BEAUTY
+                </span>
+
+            </div>
+
+
+            <!-- TEXTO -->
+            <p class="rodape-texto">
+                Beleza do seu jeito.
+            </p>
+
+
+            <!-- ACESSO ADMINISTRATIVO -->
+            <a
+                href="/admin-login.html"
+                class="rodape-admin"
+                title="Acesso administrativo"
+            >
+                Área Administrativa
+            </a>
+
+        </div>
+
+    </footer>
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <!--
+        O JavaScript fica no final do body.
+
+        Assim garantimos que todos os elementos HTML
+        já existam antes do JS tentar encontrá-los.
+    -->
+
+    <script src="/js/home.js"></script>
+
+
+</body>
+
+</html>

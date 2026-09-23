@@ -1,0 +1,1193 @@
+/* ============================================================
+   WEBLUE - ADMIN-PRODUTOS.CSS
+   Painel administrativo de produtos
+   ============================================================ */
+
+
+/* ============================================================
+   1. RESET
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: #f5f8fc;
+    color: #071b41;
+}
+
+body.modal-aberto {
+    overflow: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button,
+select {
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   2. ACESSIBILIDADE
+   ============================================================ */
+
+.sr-only {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    padding: 0;
+    margin: -1px;
+
+    overflow: hidden;
+
+    clip: rect(0, 0, 0, 0);
+
+    white-space: nowrap;
+    border: 0;
+}
+
+
+/* ============================================================
+   3. CABEÇALHO
+   ============================================================ */
+
+.cabecalho {
+    width: 100%;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.cabecalho-container {
+    width: min(1200px, calc(100% - 48px));
+    min-height: 88px;
+
+    margin: 0 auto;
+
+    display: flex;
+    align-items: center;
+
+    gap: 32px;
+}
+
+
+/* ============================================================
+   4. LOGO
+   ============================================================ */
+
+.logo {
+    display: flex;
+    flex-direction: column;
+
+    flex-shrink: 0;
+}
+
+.logo-nome {
+    color: #031b48;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+.logo-subtitulo {
+    color: #0869dc;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 4px;
+}
+
+
+/* ============================================================
+   5. TÍTULO DO CABEÇALHO
+   ============================================================ */
+
+.cabecalho-titulo {
+    padding-left: 30px;
+
+    border-left: 1px solid #dfe6ef;
+}
+
+.cabecalho-tag {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #0869dc;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 2px;
+}
+
+.cabecalho-titulo h1 {
+    color: #031b48;
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   6. BOTÃO VOLTAR
+   ============================================================ */
+
+.botao-voltar {
+    margin-left: auto;
+
+    padding: 11px 18px;
+
+    border: 1px solid #dce5f0;
+    border-radius: 999px;
+
+    background: #ffffff;
+    color: #536176;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition:
+        color 0.2s ease,
+        border-color 0.2s ease,
+        background 0.2s ease;
+}
+
+.botao-voltar:hover {
+    color: #0869dc;
+
+    border-color: #b8d4f8;
+
+    background: #f5f9ff;
+}
+
+
+/* ============================================================
+   7. CONTAINER PRINCIPAL
+   ============================================================ */
+
+.pagina-admin {
+    width: min(1200px, calc(100% - 48px));
+
+    margin: 0 auto;
+
+    padding: 55px 0 100px;
+}
+
+
+/* ============================================================
+   8. RESUMO
+   ============================================================ */
+
+.resumo {
+    margin-bottom: 35px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 30px;
+}
+
+.titulo-pequeno {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #0869dc;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 4px;
+    text-transform: uppercase;
+}
+
+.resumo h2,
+.listagem-cabecalho h2 {
+    color: #031b48;
+
+    font-size: 30px;
+    line-height: 1.15;
+
+    font-weight: 800;
+}
+
+.resumo p {
+    max-width: 620px;
+
+    margin-top: 9px;
+
+    color: #7a879c;
+
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+
+/* ============================================================
+   9. BOTÃO NOVO PRODUTO
+   ============================================================ */
+
+.botao-principal {
+    min-height: 46px;
+
+    padding: 0 22px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #0869dc;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    box-shadow:
+        0 8px 20px rgba(8, 105, 220, 0.18);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.botao-principal:hover {
+    background: #0657ba;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 12px 25px rgba(8, 105, 220, 0.25);
+}
+
+
+/* ============================================================
+   10. ESTATÍSTICAS
+   ============================================================ */
+
+.estatisticas {
+    margin-bottom: 30px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.estatistica-card {
+    min-height: 125px;
+
+    padding: 22px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    border: 1px solid #e0e7f0;
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 6px 20px rgba(3, 27, 72, 0.04);
+}
+
+.estatistica-label {
+    color: #7a879c;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.estatistica-valor {
+    color: #031b48;
+
+    font-size: 34px;
+    line-height: 1;
+
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   11. FILTROS
+   ============================================================ */
+
+.barra-filtros {
+    margin-bottom: 30px;
+
+    padding: 16px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    border: 1px solid #e0e7f0;
+    border-radius: 14px;
+
+    background: #ffffff;
+}
+
+.campo-pesquisa {
+    flex: 1;
+}
+
+.campo-pesquisa input,
+.barra-filtros select {
+    width: 100%;
+    height: 44px;
+
+    padding: 0 15px;
+
+    border: 1px solid #dce3ed;
+    border-radius: 9px;
+
+    outline: none;
+
+    background: #f8fafc;
+    color: #031b48;
+
+    font-size: 13px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.campo-pesquisa input::placeholder {
+    color: #98a2b3;
+}
+
+.campo-pesquisa input:focus,
+.barra-filtros select:focus {
+    border-color: #0869dc;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(8, 105, 220, 0.10);
+}
+
+.barra-filtros select {
+    width: 190px;
+}
+
+
+/* ============================================================
+   12. MENSAGENS
+   ============================================================ */
+
+.mensagem {
+    margin-bottom: 25px;
+
+    padding: 14px 18px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    line-height: 1.5;
+}
+
+.mensagem.sucesso {
+    border: 1px solid #b7e4c7;
+
+    background: #edf9f1;
+    color: #18733c;
+}
+
+.mensagem.erro {
+    border: 1px solid #f2b8b5;
+
+    background: #fff2f1;
+    color: #b42318;
+}
+
+.mensagem.info {
+    border: 1px solid #bfd7f7;
+
+    background: #edf5ff;
+    color: #0757ad;
+}
+
+
+/* ============================================================
+   13. LISTAGEM
+   ============================================================ */
+
+.secao-listagem {
+    padding: 28px;
+
+    border: 1px solid #e0e7f0;
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 8px 25px rgba(3, 27, 72, 0.04);
+}
+
+.listagem-cabecalho {
+    margin-bottom: 25px;
+}
+
+.listagem-cabecalho h2 {
+    font-size: 24px;
+}
+
+
+/* ============================================================
+   14. GRID DOS PRODUTOS
+   ============================================================ */
+
+.lista-produtos {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+
+/* ============================================================
+   15. CARD DO PRODUTO
+   ============================================================ */
+
+.admin-produto-card {
+    min-width: 0;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid #e1e8f0;
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    transition:
+        transform 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.admin-produto-card:hover {
+    transform: translateY(-3px);
+
+    border-color: #c4d9f4;
+
+    box-shadow:
+        0 12px 30px rgba(3, 27, 72, 0.08);
+}
+
+
+/* ============================================================
+   16. IMAGEM DO PRODUTO
+   ============================================================ */
+
+.admin-produto-imagem {
+    position: relative;
+
+    width: 100%;
+    height: 210px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #edf5ff,
+            #dcecff
+        );
+}
+
+.admin-produto-imagem img {
+    width: 100%;
+    height: 100%;
+
+    padding: 18px;
+
+    display: block;
+
+    object-fit: contain;
+}
+
+.admin-produto-sem-imagem {
+    color: #0869dc;
+
+    font-size: 24px;
+    font-weight: 800;
+
+    letter-spacing: 1px;
+}
+
+
+/* ============================================================
+   17. STATUS
+   ============================================================ */
+
+.status-produto {
+    position: absolute;
+
+    top: 12px;
+    right: 12px;
+
+    padding: 6px 9px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 0.8px;
+}
+
+.status-produto.ativo {
+    background: #e8f7ed;
+    color: #18733c;
+}
+
+.status-produto.inativo {
+    background: #fff0ef;
+    color: #b42318;
+}
+
+
+/* ============================================================
+   18. CONTEÚDO DO CARD
+   ============================================================ */
+
+.admin-produto-conteudo {
+    padding: 18px;
+
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+}
+
+.admin-produto-categoria {
+    width: fit-content;
+
+    margin-bottom: 9px;
+
+    padding: 5px 8px;
+
+    border-radius: 999px;
+
+    background: #eaf3ff;
+    color: #0869dc;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    letter-spacing: 0.7px;
+
+    text-transform: uppercase;
+}
+
+.admin-produto-nome {
+    margin-bottom: 6px;
+
+    color: #031b48;
+
+    font-size: 17px;
+    line-height: 1.3;
+
+    font-weight: 800;
+}
+
+.admin-produto-marca {
+    margin-bottom: 14px;
+
+    color: #7a879c;
+
+    font-size: 12px;
+}
+
+.admin-produto-descricao {
+    margin-bottom: 18px;
+
+    color: #667085;
+
+    font-size: 12px;
+    line-height: 1.55;
+
+    flex: 1;
+}
+
+
+/* ============================================================
+   19. PREÇO E ESTOQUE
+   ============================================================ */
+
+.admin-produto-dados {
+    margin-bottom: 17px;
+
+    padding-top: 15px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    border-top: 1px solid #edf0f4;
+}
+
+.admin-produto-preco {
+    color: #031b48;
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.admin-produto-estoque {
+    color: #667085;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-align: right;
+}
+
+
+/* ============================================================
+   20. AÇÕES DO CARD
+   ============================================================ */
+
+.admin-produto-acoes {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 8px;
+}
+
+.botao-editar,
+.botao-status {
+    min-height: 39px;
+
+    padding: 0 10px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.botao-editar {
+    border: 1px solid #cbdcf2;
+
+    background: #f5f9ff;
+    color: #0869dc;
+}
+
+.botao-editar:hover {
+    border-color: #0869dc;
+
+    background: #eaf3ff;
+}
+
+.botao-status {
+    border: 1px solid #e0e6ed;
+
+    background: #ffffff;
+    color: #536176;
+}
+
+.botao-status:hover {
+    border-color: #bcc8d6;
+
+    background: #f8fafc;
+}
+
+
+/* ============================================================
+   21. CARREGANDO / SEM RESULTADOS
+   ============================================================ */
+
+.carregando,
+.sem-produtos {
+    grid-column: 1 / -1;
+
+    padding: 50px 20px;
+
+    color: #7a879c;
+
+    font-size: 14px;
+
+    text-align: center;
+}
+
+
+/* ============================================================
+   22. MODAL
+   ============================================================ */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+}
+
+
+/*
+   Muito importante:
+   o atributo hidden precisa realmente
+   retirar o modal da tela.
+*/
+.modal[hidden] {
+    display: none;
+}
+
+
+/* ============================================================
+   23. FUNDO DO MODAL
+   ============================================================ */
+
+.modal-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background: rgba(3, 27, 72, 0.60);
+
+    backdrop-filter: blur(4px);
+}
+
+
+/* ============================================================
+   24. CONTEÚDO DO MODAL
+   ============================================================ */
+
+.modal-conteudo {
+    position: relative;
+    z-index: 2;
+
+    width: min(680px, 100%);
+    max-height: calc(100vh - 48px);
+
+    overflow-y: auto;
+
+    padding: 30px;
+
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ============================================================
+   25. CABEÇALHO DO MODAL
+   ============================================================ */
+
+.modal-cabecalho {
+    margin-bottom: 28px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.modal-cabecalho h2 {
+    color: #031b48;
+
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.botao-fechar {
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f1f5f9;
+    color: #536176;
+
+    font-size: 25px;
+    line-height: 1;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.botao-fechar:hover {
+    background: #e4edf7;
+    color: #031b48;
+}
+
+
+/* ============================================================
+   26. FORMULÁRIO
+   ============================================================ */
+
+.form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.campo {
+    margin-bottom: 18px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+}
+
+.form-grid .campo {
+    margin-bottom: 0;
+}
+
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+.campo label {
+    color: #344054;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+    width: 100%;
+
+    border: 1px solid #d9e1eb;
+    border-radius: 9px;
+
+    outline: none;
+
+    background: #f8fafc;
+    color: #031b48;
+
+    font-size: 13px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.campo input,
+.campo select {
+    height: 45px;
+
+    padding: 0 13px;
+}
+
+.campo textarea {
+    min-height: 105px;
+
+    padding: 13px;
+
+    resize: vertical;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+    color: #98a2b3;
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+    border-color: #0869dc;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(8, 105, 220, 0.10);
+}
+
+
+/* ============================================================
+   27. AÇÕES DO FORMULÁRIO
+   ============================================================ */
+
+.form-acoes {
+    margin-top: 28px;
+
+    padding-top: 22px;
+
+    display: flex;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    border-top: 1px solid #edf0f4;
+}
+
+.botao-secundario,
+.botao-salvar {
+    min-height: 44px;
+
+    padding: 0 20px;
+
+    border-radius: 9px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.botao-secundario {
+    border: 1px solid #dce3ed;
+
+    background: #ffffff;
+    color: #536176;
+}
+
+.botao-secundario:hover {
+    background: #f7f9fc;
+
+    border-color: #c3cfdd;
+}
+
+.botao-salvar {
+    border: none;
+
+    background: #0869dc;
+    color: #ffffff;
+}
+
+.botao-salvar:hover {
+    background: #0657ba;
+
+    transform: translateY(-1px);
+}
+
+.botao-salvar:disabled {
+    background: #a8c9ef;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* ============================================================
+   28. RESPONSIVIDADE - TABLET
+   ============================================================ */
+
+@media (max-width: 950px) {
+
+    .estatisticas {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .lista-produtos {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+
+/* ============================================================
+   29. RESPONSIVIDADE - CELULAR
+   ============================================================ */
+
+@media (max-width: 650px) {
+
+    .cabecalho-container {
+        width: calc(100% - 32px);
+
+        min-height: 76px;
+
+        gap: 15px;
+    }
+
+    .cabecalho-titulo {
+        display: none;
+    }
+
+    .botao-voltar {
+        padding: 10px 13px;
+
+        font-size: 11px;
+    }
+
+    .pagina-admin {
+        width: calc(100% - 32px);
+
+        padding-top: 35px;
+    }
+
+    .resumo {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .resumo h2 {
+        font-size: 26px;
+    }
+
+    .botao-principal {
+        width: 100%;
+    }
+
+    .estatisticas {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 10px;
+    }
+
+    .estatistica-card {
+        min-height: 105px;
+
+        padding: 17px;
+    }
+
+    .estatistica-valor {
+        font-size: 28px;
+    }
+
+    .barra-filtros {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .barra-filtros select {
+        width: 100%;
+    }
+
+    .secao-listagem {
+        padding: 18px;
+    }
+
+    .lista-produtos {
+        grid-template-columns: 1fr;
+    }
+
+    .modal {
+        padding: 12px;
+    }
+
+    .modal-conteudo {
+        max-height: calc(100vh - 24px);
+
+        padding: 22px 18px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .campo-completo {
+        grid-column: auto;
+    }
+
+    .form-acoes {
+        flex-direction: column-reverse;
+    }
+
+    .botao-secundario,
+    .botao-salvar {
+        width: 100%;
+    }
+}
+
+
+/* ============================================================
+   30. TELAS MUITO PEQUENAS
+   ============================================================ */
+
+@media (max-width: 390px) {
+
+    .estatisticas {
+        grid-template-columns: 1fr;
+    }
+
+    .logo-nome {
+        font-size: 19px;
+    }
+
+    .botao-voltar {
+        font-size: 10px;
+    }
+}

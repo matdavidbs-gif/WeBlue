@@ -1,19 +1,52 @@
-const form = document.getElementById("form-recuperacao");
-
-const mensagem = document.getElementById("mensagem");
-
-const campoEmail = document.getElementById("email");
-const campoToken = document.getElementById("token");
-const campoNovaSenha = document.getElementById("nova-senha");
-const campoConfirmarSenha = document.getElementById("confirmar-senha");
-
-const botaoSolicitarToken = document.getElementById("solicitar-token");
-const botaoAlterarSenha = form.querySelector(".botao-principal");
+// ============================================================
+// WEBLUE - RECUPERAÇÃO DE SENHA
+// ============================================================
 
 
-// ==========================================
+// ============================================================
+// ELEMENTOS DA PÁGINA
+// ============================================================
+
+const form =
+    document.getElementById("form-recuperacao");
+
+const mensagem =
+    document.getElementById("mensagem");
+
+const campoEmail =
+    document.getElementById("email");
+
+const campoToken =
+    document.getElementById("token");
+
+const campoNovaSenha =
+    document.getElementById("nova-senha");
+
+const campoConfirmarSenha =
+    document.getElementById("confirmar-senha");
+
+const botaoSolicitarToken =
+    document.getElementById("solicitar-token");
+
+const botaoAlterarSenha =
+    form.querySelector(".botao-principal");
+
+
+// ============================================================
+// CONFIGURAÇÃO DA API
+// ============================================================
+
+// Rotas centralizadas da Weblue.
+const API_SOLICITAR_RECUPERACAO =
+    "/api/auth/solicitar-recuperacao";
+
+const API_REDEFINIR_SENHA =
+    "/api/auth/redefinir-senha";
+
+
+// ============================================================
 // MOSTRAR / OCULTAR SENHA
-// ==========================================
+// ============================================================
 
 const botoesMostrarSenha =
     document.querySelectorAll(".mostrar-senha");
@@ -23,31 +56,38 @@ botoesMostrarSenha.forEach((botao) => {
 
     botao.addEventListener("click", () => {
 
-        const alvo = botao.dataset.alvo;
+        const alvo =
+            botao.dataset.alvo;
 
-        const campo = document.getElementById(alvo);
+        const campo =
+            document.getElementById(alvo);
 
         if (!campo) {
             return;
         }
 
+
         if (campo.type === "password") {
 
             campo.type = "text";
-            botao.textContent = "Ocultar";
+
+            botao.textContent =
+                "Ocultar";
 
         } else {
 
             campo.type = "password";
-            botao.textContent = "Mostrar";
+
+            botao.textContent =
+                "Mostrar";
         }
     });
 });
 
 
-// ==========================================
+// ============================================================
 // MENSAGENS
-// ==========================================
+// ============================================================
 
 function exibirMensagem(texto, tipo) {
 
@@ -58,19 +98,21 @@ function exibirMensagem(texto, tipo) {
 }
 
 
-// ==========================================
+// ============================================================
 // VALIDAR E-MAIL
-// ==========================================
+// ============================================================
 
 function emailValido(email) {
 
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        email
+    );
 }
 
 
-// ==========================================
-// VALIDAR SENHA
-// ==========================================
+// ============================================================
+// VALIDIDAR SENHA
+// ============================================================
 
 function senhaValida(senha) {
 
@@ -84,10 +126,10 @@ function senhaValida(senha) {
 }
 
 
-// ==========================================
+// ============================================================
 // ETAPA 1
-// SOLICITAR TOKEN
-// ==========================================
+// SOLICITAR TOKEN DE RECUPERAÇÃO
+// ============================================================
 
 if (botaoSolicitarToken) {
 
@@ -95,11 +137,20 @@ if (botaoSolicitarToken) {
         "click",
         async () => {
 
-            const email = campoEmail.value.trim();
+            const email =
+                campoEmail.value.trim();
 
+
+            // Limpa mensagens anteriores.
             mensagem.textContent = "";
-            mensagem.className = "mensagem";
 
+            mensagem.className =
+                "mensagem";
+
+
+            // =================================================
+            // E-MAIL OBRIGATÓRIO
+            // =================================================
 
             if (!email) {
 
@@ -114,6 +165,10 @@ if (botaoSolicitarToken) {
             }
 
 
+            // =================================================
+            // VALIDAR FORMATO DO E-MAIL
+            // =================================================
+
             if (!emailValido(email)) {
 
                 exibirMensagem(
@@ -127,7 +182,12 @@ if (botaoSolicitarToken) {
             }
 
 
-            botaoSolicitarToken.disabled = true;
+            // =================================================
+            // ESTADO DE CARREGAMENTO
+            // =================================================
+
+            botaoSolicitarToken.disabled =
+                true;
 
             botaoSolicitarToken.textContent =
                 "Gerando token...";
@@ -135,8 +195,12 @@ if (botaoSolicitarToken) {
 
             try {
 
+                // =============================================
+                // POST /api/auth/solicitar-recuperacao
+                // =============================================
+
                 const resposta = await fetch(
-                    "/auth/solicitar-recuperacao",
+                    API_SOLICITAR_RECUPERACAO,
                     {
                         method: "POST",
 
@@ -152,9 +216,17 @@ if (botaoSolicitarToken) {
                 );
 
 
+                // =============================================
+                // RESPOSTA DA API
+                // =============================================
+
                 const dados =
                     await resposta.json();
 
+
+                // =============================================
+                // ERRO
+                // =============================================
 
                 if (!resposta.ok) {
 
@@ -165,16 +237,17 @@ if (botaoSolicitarToken) {
                 }
 
 
-                // ==================================
+                // =============================================
                 // SOMENTE PARA O PROTÓTIPO
-                // ==================================
+                // =============================================
                 //
-                // O backend está retornando o token
-                // diretamente.
+                // Atualmente o backend retorna o token
+                // diretamente na resposta.
                 //
-                // Em produção ele seria enviado
-                // por e-mail.
-                // ==================================
+                // Em uma aplicação em produção,
+                // normalmente esse token seria enviado
+                // para o e-mail do cliente.
+                // =============================================
 
                 if (dados.token_recuperacao) {
 
@@ -182,6 +255,10 @@ if (botaoSolicitarToken) {
                         dados.token_recuperacao;
                 }
 
+
+                // =============================================
+                // SUCESSO
+                // =============================================
 
                 exibirMensagem(
                     "Token de recuperação gerado. Ele é válido por 15 minutos.",
@@ -221,10 +298,10 @@ if (botaoSolicitarToken) {
 }
 
 
-// ==========================================
+// ============================================================
 // ETAPA 2
 // REDEFINIR SENHA
-// ==========================================
+// ============================================================
 
 form.addEventListener(
     "submit",
@@ -232,6 +309,10 @@ form.addEventListener(
 
         event.preventDefault();
 
+
+        // ====================================================
+        // DADOS INFORMADOS PELO CLIENTE
+        // ====================================================
 
         const email =
             campoEmail.value.trim();
@@ -246,13 +327,17 @@ form.addEventListener(
             campoConfirmarSenha.value;
 
 
-        mensagem.className = "mensagem";
-        mensagem.textContent = "";
+        // Limpa mensagens anteriores.
+        mensagem.className =
+            "mensagem";
+
+        mensagem.textContent =
+            "";
 
 
-        // ==================================
+        // ====================================================
         // CAMPOS OBRIGATÓRIOS
-        // ==================================
+        // ====================================================
 
         if (
             !email ||
@@ -270,9 +355,9 @@ form.addEventListener(
         }
 
 
-        // ==================================
-        // E-MAIL
-        // ==================================
+        // ====================================================
+        // VALIDAR E-MAIL
+        // ====================================================
 
         if (!emailValido(email)) {
 
@@ -287,9 +372,9 @@ form.addEventListener(
         }
 
 
-        // ==================================
-        // SENHA
-        // ==================================
+        // ====================================================
+        // VALIDAR NOVA SENHA
+        // ====================================================
 
         if (!senhaValida(novaSenha)) {
 
@@ -304,9 +389,9 @@ form.addEventListener(
         }
 
 
-        // ==================================
-        // CONFIRMAÇÃO
-        // ==================================
+        // ====================================================
+        // CONFIRMAR SENHA
+        // ====================================================
 
         if (novaSenha !== confirmarSenha) {
 
@@ -321,7 +406,12 @@ form.addEventListener(
         }
 
 
-        botaoAlterarSenha.disabled = true;
+        // ====================================================
+        // ESTADO DE CARREGAMENTO
+        // ====================================================
+
+        botaoAlterarSenha.disabled =
+            true;
 
         botaoAlterarSenha.textContent =
             "Alterando senha...";
@@ -329,8 +419,12 @@ form.addEventListener(
 
         try {
 
+            // ================================================
+            // POST /api/auth/redefinir-senha
+            // ================================================
+
             const resposta = await fetch(
-                "/auth/redefinir-senha",
+                API_REDEFINIR_SENHA,
                 {
                     method: "POST",
 
@@ -345,7 +439,8 @@ form.addEventListener(
 
                         token: token,
 
-                        nova_senha: novaSenha,
+                        nova_senha:
+                            novaSenha,
 
                         confirmar_senha:
                             confirmarSenha
@@ -353,6 +448,10 @@ form.addEventListener(
                 }
             );
 
+
+            // =================================================
+            // LER RESPOSTA
+            // =================================================
 
             let dados = {};
 
@@ -367,10 +466,18 @@ form.addEventListener(
             }
 
 
+            // =================================================
+            // ERRO
+            // =================================================
+
             if (!resposta.ok) {
 
-                let detalhe = dados.detail;
+                let detalhe =
+                    dados.detail;
 
+
+                // FastAPI pode devolver erros
+                // de validação como uma lista.
                 if (Array.isArray(detalhe)) {
 
                     detalhe =
@@ -385,6 +492,10 @@ form.addEventListener(
             }
 
 
+            // =================================================
+            // SENHA ALTERADA
+            // =================================================
+
             exibirMensagem(
                 "Senha alterada com sucesso. Redirecionando para o login...",
                 "sucesso"
@@ -394,12 +505,19 @@ form.addEventListener(
             form.reset();
 
 
-            setTimeout(() => {
+            // =================================================
+            // REDIRECIONAR PARA LOGIN
+            // =================================================
 
-                window.location.href =
-                    "/login";
+            setTimeout(
+                () => {
 
-            }, 1500);
+                    window.location.href =
+                        "/login";
+
+                },
+                1500
+            );
 
 
         } catch (erro) {
@@ -419,6 +537,10 @@ form.addEventListener(
 
 
         } finally {
+
+            // =================================================
+            // RESTAURAR BOTÃO
+            // =================================================
 
             botaoAlterarSenha.disabled =
                 false;

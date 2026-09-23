@@ -1,175 +1,723 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!--
+    Define que o idioma principal da página é português do Brasil.
+-->
+<html lang="pt-BR">
+
+<head>
+
+    <!--
+        Permite utilizar corretamente acentos e caracteres especiais.
+    -->
+    <meta charset="UTF-8">
+
+    <!--
+        Faz a página se adaptar corretamente a celulares e tablets.
+    -->
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <!--
+        Título exibido na aba do navegador.
+    -->
     <title>Minha Conta | Weblue</title>
 
-    <link rel="stylesheet" href="css/cliente.css">
+    <!--
+        Arquivo CSS responsável pelo visual da área do cliente.
+    -->
+    <link
+        rel="stylesheet"
+        href="css/cliente.css"
+    >
+
 </head>
+
 
 <body>
 
+
+<!-- =========================================================
+     CONTAINER PRINCIPAL DA ÁREA DO CLIENTE
+========================================================= -->
+
 <div class="pagina-cliente">
+
+
+    <!-- =====================================================
+         BARRA LATERAL
+    ====================================================== -->
 
     <aside class="barra-lateral">
 
+
+        <!-- =================================================
+             MARCA WEBLUE
+        ================================================== -->
+
         <div class="marca">
-            <div class="marca-simbolo">W</div>
-            <span>Weblue</span>
+
+            <!--
+                Símbolo temporário da Weblue.
+            -->
+            <div class="marca-simbolo">
+                W
+            </div>
+
+            <!--
+                Nome da loja.
+            -->
+            <span>
+                Weblue
+            </span>
+
         </div>
+
+
+        <!-- =================================================
+             MENU DE NAVEGAÇÃO
+        ================================================== -->
 
         <nav class="menu">
 
-            <a href="#" class="menu-item ativo">
+
+            <!--
+                Página atual.
+            -->
+            <a
+                href="#"
+                class="menu-item ativo"
+            >
                 Minha conta
             </a>
 
-            <a href="#" class="menu-item">
+
+            <!--
+                Futuramente levará para os pedidos.
+            -->
+            <a
+                href="#"
+                class="menu-item"
+            >
                 Meus pedidos
             </a>
 
-            <a href="#" class="menu-item">
+
+            <!--
+                Futuramente permitirá gerenciar endereços.
+            -->
+            <a
+                href="#"
+                class="menu-item"
+            >
                 Endereços
             </a>
 
-            <a href="#" class="menu-item">
+
+            <!--
+                Futuramente mostrará os produtos favoritos.
+            -->
+            <a
+                href="#"
+                class="menu-item"
+            >
                 Favoritos
             </a>
 
+
+            <!--
+                Futuramente teremos alteração de senha
+                e outras configurações de segurança.
+            -->
+            <a
+                href="#"
+                class="menu-item"
+            >
+                Segurança
+            </a>
+
+
         </nav>
 
-        <button id="btnSair" class="btn-sair">
+
+        <!-- =================================================
+             BOTÃO DE LOGOUT
+        ================================================== -->
+
+        <!--
+            O cliente.js utiliza o ID "btnSair"
+            para localizar este botão e encerrar a sessão.
+        -->
+        <button
+            id="btnSair"
+            class="btn-sair"
+            type="button"
+        >
             Sair
         </button>
+
 
     </aside>
 
 
+    <!-- =====================================================
+         CONTEÚDO PRINCIPAL
+    ====================================================== -->
+
     <main class="conteudo">
+
+
+        <!-- =================================================
+             CABEÇALHO
+        ================================================== -->
 
         <header class="cabecalho">
 
-            <div>
-                <p class="bem-vindo">Bem-vindo(a) de volta!</p>
 
+            <div>
+
+                <p class="bem-vindo">
+                    Bem-vindo(a) de volta!
+                </p>
+
+
+                <!--
+                    O JavaScript substitui "Cliente Weblue"
+                    pelo nome real recebido do GET /perfil.
+                -->
                 <h1 id="nomeCliente">
                     Cliente Weblue
                 </h1>
+
             </div>
 
-            <div class="avatar" id="avatarCliente">
+
+            <!--
+                O JavaScript coloca aqui a primeira letra
+                do nome do cliente.
+            -->
+            <div
+                class="avatar"
+                id="avatarCliente"
+            >
                 W
             </div>
+
 
         </header>
 
 
+        <!-- =================================================
+             RESUMO DA CONTA
+        ================================================== -->
+
         <section class="resumo">
 
-            <div class="cartao-resumo">
-                <span>Pedidos</span>
-                <strong>0</strong>
-                <small>Pedidos realizados</small>
-            </div>
+
+            <!-- =================================================
+                 PEDIDOS
+            ================================================== -->
 
             <div class="cartao-resumo">
-                <span>Favoritos</span>
-                <strong>0</strong>
-                <small>Produtos salvos</small>
+
+                <span>
+                    Pedidos
+                </span>
+
+                <!--
+                    Posteriormente este valor poderá vir
+                    do banco de dados.
+                -->
+                <strong>
+                    0
+                </strong>
+
+                <small>
+                    Pedidos realizados
+                </small>
+
             </div>
 
+
+            <!-- =================================================
+                 FAVORITOS
+            ================================================== -->
+
             <div class="cartao-resumo">
-                <span>Status</span>
-                <strong class="status-ativo">Ativa</strong>
-                <small>Sua conta está ativa</small>
+
+                <span>
+                    Favoritos
+                </span>
+
+                <!--
+                    Posteriormente será atualizado
+                    de acordo com os favoritos do cliente.
+                -->
+                <strong>
+                    0
+                </strong>
+
+                <small>
+                    Produtos salvos
+                </small>
+
             </div>
+
+
+            <!-- =================================================
+                 STATUS DA CONTA
+            ================================================== -->
+
+            <div class="cartao-resumo">
+
+                <span>
+                    Status
+                </span>
+
+
+                <!--
+                    Agora o status possui um ID.
+
+                    Dessa forma, o JavaScript poderá mostrar
+                    o status real recebido do backend.
+                -->
+                <strong
+                    id="clienteStatus"
+                    class="status-ativo"
+                >
+                    ---
+                </strong>
+
+
+                <small>
+                    Status da sua conta
+                </small>
+
+            </div>
+
 
         </section>
 
+
+        <!-- =====================================================
+             DADOS DA CONTA
+        ====================================================== -->
 
         <section class="dados-conta">
 
+
+            <!-- =================================================
+                 TÍTULO DA SEÇÃO
+            ================================================== -->
+
             <div class="titulo-secao">
 
+
                 <div>
-                    <h2>Meus dados</h2>
-                    <p>Informações cadastradas na sua conta</p>
+
+                    <h2>
+                        Meus dados
+                    </h2>
+
+                    <p>
+                        Informações cadastradas na sua conta
+                    </p>
+
                 </div>
 
-                <button class="btn-editar">
+
+                <!--
+                    Este botão será controlado pelo cliente.js.
+
+                    Ao clicar nele, esconderemos os dados
+                    em modo de leitura e mostraremos o
+                    formulário de edição.
+                -->
+                <button
+                    id="btnEditarDados"
+                    class="btn-editar"
+                    type="button"
+                >
                     Editar dados
                 </button>
 
+
+            </div>
+
+
+            <!-- =================================================
+                 MODO DE VISUALIZAÇÃO
+            ================================================== -->
+
+            <!--
+                Esta área aparece normalmente quando o cliente
+                entra na página.
+
+                Os dados são preenchidos pelo GET /perfil.
+            -->
+            <div
+                id="visualizacaoDados"
+                class="grade-dados"
+            >
+
+
+                <!-- =================================================
+                     NOME
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label>
+                        Nome completo
+                    </label>
+
+                    <p id="clienteNome">
+                        ---
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     E-MAIL
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label>
+                        E-mail
+                    </label>
+
+                    <p id="clienteEmail">
+                        ---
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     CPF
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label>
+                        CPF
+                    </label>
+
+                    <!--
+                        O CPF será exibido, mas não poderá ser
+                        alterado pelo formulário de edição.
+                    -->
+                    <p id="clienteCpf">
+                        ---
+                    </p>
+
+                </div>
+
+
+                <!-- =================================================
+                     TELEFONE
+                ================================================== -->
+
+                <div class="campo">
+
+                    <label>
+                        Telefone
+                    </label>
+
+                    <p id="clienteTelefone">
+                        ---
+                    </p>
+
+                </div>
+
+
             </div>
 
 
-            <div class="grade-dados">
+            <!-- =================================================
+                 FORMULÁRIO DE EDIÇÃO
+            ================================================== -->
 
-                <div class="campo">
-                    <label>Nome completo</label>
-                    <p id="clienteNome">---</p>
+            <!--
+                Começa escondido.
+
+                Quando o cliente clicar em "Editar dados",
+                o JavaScript exibirá este formulário.
+            -->
+            <form
+                id="formEditarPerfil"
+                class="form-editar-perfil"
+                hidden
+            >
+
+
+                <!-- =================================================
+                     NOME
+                ================================================== -->
+
+                <div class="campo-edicao">
+
+                    <label for="inputNome">
+                        Nome completo
+                    </label>
+
+
+                    <!--
+                        required:
+                        impede envio vazio pelo navegador.
+
+                        minlength:
+                        acompanha a validação básica do backend.
+                    -->
+                    <input
+                        type="text"
+                        id="inputNome"
+                        name="nome_completo"
+                        minlength="3"
+                        maxlength="150"
+                        required
+                    >
+
                 </div>
 
-                <div class="campo">
-                    <label>E-mail</label>
-                    <p id="clienteEmail">---</p>
+
+                <!-- =================================================
+                     E-MAIL
+                ================================================== -->
+
+                <div class="campo-edicao">
+
+                    <label for="inputEmail">
+                        E-mail
+                    </label>
+
+
+                    <!--
+                        type="email" faz uma validação básica
+                        do formato do endereço.
+                    -->
+                    <input
+                        type="email"
+                        id="inputEmail"
+                        name="email"
+                        required
+                    >
+
                 </div>
 
-                <div class="campo">
-                    <label>CPF</label>
-                    <p id="clienteCpf">---</p>
+
+                <!-- =================================================
+                     CPF
+                ================================================== -->
+
+                <div class="campo-edicao">
+
+                    <label for="inputCpf">
+                        CPF
+                    </label>
+
+
+                    <!--
+                        O CPF aparece no formulário apenas para
+                        consulta.
+
+                        disabled impede que o cliente altere
+                        este campo.
+                    -->
+                    <input
+                        type="text"
+                        id="inputCpf"
+                        disabled
+                    >
+
+                    <small class="campo-ajuda">
+                        O CPF não pode ser alterado por esta página.
+                    </small>
+
                 </div>
 
-                <div class="campo">
-                    <label>Telefone</label>
-                    <p id="clienteTelefone">---</p>
+
+                <!-- =================================================
+                     TELEFONE
+                ================================================== -->
+
+                <div class="campo-edicao">
+
+                    <label for="inputTelefone">
+                        Telefone
+                    </label>
+
+
+                    <!--
+                        O backend aceita telefone entre
+                        10 e 20 caracteres.
+                    -->
+                    <input
+                        type="tel"
+                        id="inputTelefone"
+                        name="telefone"
+                        minlength="10"
+                        maxlength="20"
+                        required
+                    >
+
                 </div>
 
-            </div>
+
+                <!-- =================================================
+                     MENSAGEM DE RETORNO
+                ================================================== -->
+
+                <!--
+                    Aqui poderemos mostrar mensagens como:
+
+                    "Perfil atualizado com sucesso."
+
+                    ou
+
+                    "Este e-mail já está cadastrado."
+                -->
+                <div
+                    id="mensagemPerfil"
+                    class="mensagem-perfil"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+
+                <!-- =================================================
+                     BOTÕES DO FORMULÁRIO
+                ================================================== -->
+
+                <div class="acoes-edicao">
+
+
+                    <!--
+                        type="button" evita que o formulário
+                        seja enviado ao clicar em cancelar.
+                    -->
+                    <button
+                        id="btnCancelarEdicao"
+                        class="btn-cancelar"
+                        type="button"
+                    >
+                        Cancelar
+                    </button>
+
+
+                    <!--
+                        Este botão envia o formulário.
+
+                        O cliente.js interceptará o evento
+                        submit e fará o PUT /perfil.
+                    -->
+                    <button
+                        id="btnSalvarPerfil"
+                        class="btn-salvar"
+                        type="submit"
+                    >
+                        Salvar alterações
+                    </button>
+
+
+                </div>
+
+
+            </form>
+
 
         </section>
 
 
+        <!-- =====================================================
+             PEDIDOS RECENTES
+        ====================================================== -->
+
         <section class="pedidos">
+
 
             <div class="titulo-secao">
 
+
                 <div>
-                    <h2>Pedidos recentes</h2>
-                    <p>Acompanhe suas últimas compras</p>
+
+                    <h2>
+                        Pedidos recentes
+                    </h2>
+
+                    <p>
+                        Acompanhe suas últimas compras
+                    </p>
+
                 </div>
+
 
             </div>
 
+
+            <!-- =================================================
+                 ESTADO SEM PEDIDOS
+            ================================================== -->
+
             <div class="sem-pedidos">
+
 
                 <div class="icone-pedido">
                     🛍️
                 </div>
 
-                <h3>Nenhum pedido encontrado</h3>
+
+                <h3>
+                    Nenhum pedido encontrado
+                </h3>
+
 
                 <p>
                     Quando você realizar uma compra,
                     seus pedidos aparecerão aqui.
                 </p>
 
-                <button class="btn-comprar">
+
+                <!--
+                    Depois podemos fazer este botão
+                    redirecionar para a Home ou catálogo.
+                -->
+                <button
+                    id="btnComprar"
+                    class="btn-comprar"
+                    type="button"
+                >
                     Começar a comprar
                 </button>
 
+
             </div>
+
 
         </section>
 
+
     </main>
+
 
 </div>
 
 
+<!-- =========================================================
+     JAVASCRIPT DA ÁREA DO CLIENTE
+========================================================= -->
+
+<!--
+    Mantemos o JavaScript no final do body para que os
+    elementos HTML já existam quando o arquivo for executado.
+-->
 <script src="js/cliente.js"></script>
 
+
 </body>
+
 </html>
