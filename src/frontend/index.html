@@ -21,9 +21,9 @@
 
 <body>
 
-    <!-- =========================
+    <!-- =====================================================
          CABEÇALHO
-    ========================== -->
+    ====================================================== -->
 
     <header class="cabecalho">
 
@@ -31,6 +31,7 @@
 
             <!-- LOGO -->
             <a href="/" class="logo">
+
                 <span class="logo-nome">
                     Weblue
                 </span>
@@ -38,6 +39,7 @@
                 <span class="logo-subtitulo">
                     COSMÉTICOS
                 </span>
+
             </a>
 
 
@@ -102,6 +104,7 @@
             <!-- AÇÕES -->
             <div class="acoes">
 
+                <!-- CONTA DO CLIENTE -->
                 <a
                     href="/cliente"
                     class="acao"
@@ -111,6 +114,8 @@
                     ♙
                 </a>
 
+
+                <!-- FAVORITOS -->
                 <button
                     type="button"
                     class="acao"
@@ -120,6 +125,8 @@
                     ♡
                 </button>
 
+
+                <!-- CARRINHO -->
                 <button
                     type="button"
                     class="acao carrinho"
@@ -141,22 +148,21 @@
     </header>
 
 
-    <!-- =========================
+    <!-- =====================================================
          CONTEÚDO PRINCIPAL
-    ========================== -->
+    ====================================================== -->
 
     <main>
 
 
-        <!-- =========================
+        <!-- =================================================
              HERO
-        ========================== -->
+        ================================================== -->
 
         <section class="hero">
 
 
             <!-- TEXTO -->
-
             <div class="hero-conteudo">
 
                 <span class="hero-tag">
@@ -165,6 +171,7 @@
 
                 <h1>
                     Beleza que
+
                     <span>
                         te faz bem.
                     </span>
@@ -190,7 +197,6 @@
 
 
             <!-- IMAGEM PRINCIPAL -->
-
             <div class="hero-arte">
 
                 <img
@@ -205,9 +211,9 @@
         </section>
 
 
-        <!-- =========================
+        <!-- =================================================
              CATEGORIAS
-        ========================== -->
+        ================================================== -->
 
         <section
             class="secao-categorias"
@@ -247,7 +253,6 @@
 
 
                 <!-- SKINCARE -->
-
                 <a
                     href="#"
                     class="categoria"
@@ -265,7 +270,6 @@
 
 
                 <!-- MAQUIAGEM -->
-
                 <a
                     href="#"
                     class="categoria"
@@ -283,7 +287,6 @@
 
 
                 <!-- CABELOS -->
-
                 <a
                     href="#"
                     class="categoria"
@@ -301,7 +304,6 @@
 
 
                 <!-- CORPO -->
-
                 <a
                     href="#"
                     class="categoria"
@@ -319,7 +321,6 @@
 
 
                 <!-- FRAGRÂNCIAS -->
-
                 <a
                     href="#"
                     class="categoria"
@@ -337,7 +338,6 @@
 
 
                 <!-- KITS -->
-
                 <a
                     href="#"
                     class="categoria"
@@ -361,9 +361,89 @@
     </main>
 
 
-    <!-- =========================
+    <!-- =====================================================
+         RODAPÉ
+    ====================================================== -->
+
+    <footer
+        id="sobre"
+        style="
+            background: #031b48;
+            color: white;
+            padding: 35px 20px;
+            margin-top: 50px;
+        "
+    >
+
+        <div
+            style="
+                max-width: 1100px;
+                margin: 0 auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 30px;
+                flex-wrap: wrap;
+            "
+        >
+
+            <!-- MARCA -->
+            <div>
+
+                <strong
+                    style="
+                        display: block;
+                        font-size: 20px;
+                        letter-spacing: 1px;
+                        margin-bottom: 5px;
+                    "
+                >
+                    WEBLUE
+                </strong>
+
+                <span
+                    style="
+                        font-size: 13px;
+                        opacity: 0.8;
+                    "
+                >
+                    Beleza do seu jeito.
+                </span>
+
+            </div>
+
+
+            <!-- ÁREA ADMINISTRATIVA -->
+            <div>
+
+                <a
+                    href="/admin-login.html"
+                    style="
+                        display: inline-block;
+                        padding: 10px 18px;
+                        border: 1px solid rgba(255,255,255,0.45);
+                        border-radius: 8px;
+                        color: white;
+                        text-decoration: none;
+                        font-size: 13px;
+                        font-weight: 600;
+                        transition: 0.2s;
+                    "
+                    title="Acessar área administrativa"
+                >
+                    Área Administrativa
+                </a>
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =====================================================
          JAVASCRIPT
-    ========================== -->
+    ====================================================== -->
 
     <script src="/js/home.js"></script>
 
