@@ -2,18 +2,61 @@
 // WEBLUE - CHECKOUT
 // ============================================================
 //
-// Este script consolida o carrinho em uma compra real,
-// coleta os dados do cliente e envia a compra para a API.
-// O resultado é um pedido pago com simulação de aprovação.
+// Este script consolida o carrinho e envia a compra autenticada
+// para a API. O resultado é um pedido pago com simulação de aprovação.
 // ============================================================
 
 const CHAVE_CARRINHO = "weblue-carrinho";
-const CHAVE_EMAIL = "weblue-ultimo-email";
 const resumoCheckout = document.getElementById("resumoCheckout");
 const totalCheckout = document.getElementById("totalCheckout");
 const formCheckout = document.getElementById("formCheckout");
 const metodoPagamento = document.getElementById("metodoPagamento");
 const campoCartao = document.getElementById("campoCartao");
+const clienteCheckout = document.getElementById("clienteCheckout");
+const tokenCheckout = sessionStorage.getItem("tokenWeblue");
+
+if (!tokenCheckout) {
+    sessionStorage.setItem("redirecionarAposLogin", "/checkout");
+    window.location.href = "/login";
+}
+
+async function carregarContaCheckout() {
+    if (!tokenCheckout) {
+        return;
+    }
+
+    try {
+        const resposta = await fetch("/api/perfil", {
+            headers: {
+                Authorization: `Bearer ${tokenCheckout}`,
+            },
+        });
+
+        if (resposta.status === 401) {
+            sessionStorage.removeItem("tokenWeblue");
+            sessionStorage.setItem("redirecionarAposLogin", "/checkout");
+            window.location.href = "/login";
+            return;
+        }
+
+        const dados = await resposta.json();
+        if (!resposta.ok) {
+            throw new Error(dados.detail || "Não foi possível verificar sua conta.");
+        }
+
+        if (clienteCheckout) {
+            clienteCheckout.textContent = `Compra vinculada à conta de ${dados.nome_completo} (${dados.email}).`;
+        }
+    } catch (erro) {
+        console.error("Erro ao verificar conta do checkout.", erro);
+        if (clienteCheckout) {
+            clienteCheckout.textContent = erro.message || "Não foi possível verificar sua conta.";
+        }
+        if (formCheckout) {
+            formCheckout.querySelector("button[type='submit']").disabled = true;
+        }
+    }
+}
 
 function obterCarrinho() {
     try {
@@ -87,9 +130,6 @@ if (formCheckout) {
         }
 
         const body = {
-            nome: document.getElementById("nome").value.trim(),
-            email: document.getElementById("email").value.trim(),
-            telefone: document.getElementById("telefone").value.trim(),
             endereco: document.getElementById("endereco").value.trim(),
             metodo_pagamento: metodoPagamento.value,
             numero_cartao: document.getElementById("numeroCartao").value.trim(),
@@ -99,13 +139,12 @@ if (formCheckout) {
             })),
         };
 
-        localStorage.setItem(CHAVE_EMAIL, body.email);
-
         try {
             const resposta = await fetch("/api/pedidos/checkout", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${tokenCheckout}`,
                 },
                 body: JSON.stringify(body),
             });
@@ -125,4 +164,5 @@ if (formCheckout) {
     });
 }
 
+carregarContaCheckout();
 renderResumo();

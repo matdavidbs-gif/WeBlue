@@ -14,13 +14,11 @@
 # então reutilizamos essa base para evitar duplicação.
 # ============================================================
 
-import uuid
-from datetime import datetime
 from decimal import Decimal
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
 from ..database import get_database
@@ -30,10 +28,46 @@ from ..models.pedido import Pedido, StatusPedido
 from ..models.produto import Produto
 from ..schemas.pedido import CheckoutRequest
 from ..services.admin_security import verificar_token_admin
-from ..services.security import criar_hash_senha
+from ..services.security import verificar_token_acesso
 
 router = APIRouter(tags=["Pedidos e Vendas"])
 seguranca_admin = HTTPBearer()
+seguranca_cliente = HTTPBearer(auto_error=False)
+
+
+def exigir_cliente_autenticado(
+    credenciais: HTTPAuthorizationCredentials | None = Depends(seguranca_cliente),
+    database: Session = Depends(get_database),
+) -> Cliente:
+    if credenciais is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Autenticação necessária.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    cliente_id = verificar_token_acesso(credenciais.credentials, database)
+    if cliente_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido ou expirado.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    cliente = database.get(Cliente, cliente_id)
+    if cliente is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Cliente não encontrado.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if cliente.status != "ATIVA":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Conta sem permissão de acesso.",
+        )
+
+    return cliente
 
 
 def exigir_admin_autenticado(
@@ -46,18 +80,6 @@ def exigir_admin_autenticado(
             detail="Token administrativo inválido ou expirado.",
         )
     return admin_id
-
-
-def _normalizar_telefone(telefone: str | None) -> str:
-    if not telefone:
-        return ""
-    return "".join(ch for ch in telefone if ch.isdigit())[:11]
-
-
-def _gerar_cpf_guest(email: str, telefone: str | None) -> str:
-    base = f"guest:{(email or '').strip().lower()}:{_normalizar_telefone(telefone) or 'sem-telefone'}"
-    valor = int(uuid.uuid5(uuid.NAMESPACE_DNS, base).hex[:12], 16) % 10**11
-    return str(valor).zfill(11)
 
 
 def simular_pagamento(metodo_pagamento: str, numero_cartao: str | None) -> bool:
@@ -90,151 +112,137 @@ def simular_pagamento(metodo_pagamento: str, numero_cartao: str | None) -> bool:
 def finalizar_compra(
     dados: CheckoutRequest,
     database: Session = Depends(get_database),
+    cliente: Cliente = Depends(exigir_cliente_autenticado),
 ):
     """Valida o carrinho, confirma a venda e atualiza o estoque."""
 
-    if not dados.itens:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="O carrinho está vazio.",
-        )
-
-    # Caso o cliente tenha sido informado por e-mail,
-    # buscamos o cadastro existente no banco.
-    cliente = None
-    if dados.cliente_id is not None:
-        cliente = database.get(Cliente, dados.cliente_id)
-
-    if cliente is None and dados.email:
-        cliente = database.scalar(
-            select(Cliente).where(Cliente.email == str(dados.email).strip().lower())
-        )
-
-    telefone_normalizado = _normalizar_telefone(dados.telefone)
-    if cliente is None and telefone_normalizado:
-        cliente = database.scalar(
-            select(Cliente).where(Cliente.telefone == telefone_normalizado)
-        )
-
-    # Se o cliente ainda não existe, aceitamos uma compra simples
-    # utilizando dados básicos do checkout para não bloquear o fluxo.
-    if cliente is None:
-        nome_cliente = (dados.nome or "Cliente Weblue").strip()
-        email_cliente = (dados.email or "cliente@weblue.local").strip().lower()
-
-        proximo_cliente_id = (database.scalar(select(func.max(Cliente.id))) or 0) + 1
-        cpf_guest = _gerar_cpf_guest(email_cliente, telefone_normalizado)
-        while database.scalar(select(Cliente).where(Cliente.cpf == cpf_guest)) is not None:
-            cpf_guest = _gerar_cpf_guest(f"{email_cliente}:{uuid.uuid4().hex}", telefone_normalizado)
-
-        cliente = Cliente(
-            id=proximo_cliente_id,
-            nome_completo=nome_cliente,
-            email=email_cliente,
-            cpf=cpf_guest,
-            telefone=telefone_normalizado or "00000000000",
-            senha_hash=criar_hash_senha(f"guest-{uuid.uuid4().hex}"),
-            status="ATIVA",
-            aceitou_termos_em=datetime.utcnow(),
-        )
-        database.add(cliente)
-        database.flush()
-
-    # Repassamos a ordem de compra conforme carrinho.
-    total_pedido = Decimal("0.00")
-    itens_do_pedido = []
-
+    quantidades = {}
     for item in dados.itens:
-        produto = database.get(Produto, item.produto_id)
-        if produto is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Produto {item.produto_id} não encontrado.",
+        quantidades[item.produto_id] = (
+            quantidades.get(item.produto_id, 0) + item.quantidade
+        )
+
+    try:
+        produtos = database.execute(
+            select(Produto)
+            .where(Produto.id.in_(quantidades))
+            .order_by(Produto.id)
+            .with_for_update()
+        ).scalars().all()
+        produtos_por_id = {produto.id: produto for produto in produtos}
+
+        for produto_id in sorted(quantidades):
+            produto = produtos_por_id.get(produto_id)
+            if produto is None or produto.status != "ATIVO":
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Produto {produto_id} não encontrado ou indisponível.",
+                )
+
+            if produto.estoque < quantidades[produto_id]:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        f"Produto '{produto.nome}' não possui estoque suficiente. "
+                        f"Disponível: {produto.estoque}"
+                    ),
+                )
+
+        itens_do_pedido = []
+        total_pedido = Decimal("0.00")
+        for produto_id in sorted(quantidades):
+            produto = produtos_por_id[produto_id]
+            quantidade = quantidades[produto_id]
+            preco_unitario = Decimal(str(produto.preco))
+            subtotal = preco_unitario * quantidade
+            total_pedido += subtotal
+            itens_do_pedido.append(
+                {
+                    "produto": produto,
+                    "quantidade": quantidade,
+                    "preco_unitario": preco_unitario,
+                    "subtotal": subtotal,
+                }
             )
 
-        if produto.estoque < item.quantidade:
+        if not simular_pagamento(dados.metodo_pagamento, dados.numero_cartao):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
                 detail=(
-                    f"Produto '{produto.nome}' não possui estoque suficiente. "
-                    f"Disponível: {produto.estoque}"
+                    "Pagamento recusado. Verifique os dados do pagamento e tente novamente."
                 ),
             )
 
-        subtotal = Decimal(str(produto.preco)) * item.quantidade
-        total_pedido += subtotal
-        itens_do_pedido.append(
-            {
-                "produto": produto,
-                "quantidade": item.quantidade,
-                "subtotal": subtotal,
-            }
+        for item in itens_do_pedido:
+            produto = item["produto"]
+            quantidade = item["quantidade"]
+            resultado = database.execute(
+                update(Produto)
+                .where(
+                    Produto.id == produto.id,
+                    Produto.status == "ATIVO",
+                    Produto.estoque >= quantidade,
+                )
+                .values(estoque=Produto.estoque - quantidade)
+                .execution_options(synchronize_session=False)
+            )
+            if resultado.rowcount != 1:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=(
+                        f"O estoque de '{produto.nome}' foi alterado. "
+                        "Atualize o carrinho e tente novamente."
+                    ),
+                )
+
+        pedido = Pedido(
+            cliente_id=cliente.id,
+            status=StatusPedido.PAGO,
+            valor_total=total_pedido,
         )
+        database.add(pedido)
+        database.flush()
 
-    # Simulamos a aprovação do pagamento antes de registrar o pedido.
-    pagamento_aprovado = simular_pagamento(
-        dados.metodo_pagamento,
-        dados.numero_cartao,
-    )
+        for item in itens_do_pedido:
+            database.add(
+                ItemPedido(
+                    pedido_id=pedido.id,
+                    produto_id=item["produto"].id,
+                    quantidade=item["quantidade"],
+                    preco_unitario=item["preco_unitario"],
+                    subtotal=item["subtotal"],
+                )
+            )
 
-    if not pagamento_aprovado:
-        raise HTTPException(
-            status_code=status.HTTP_402_PAYMENT_REQUIRED,
-            detail="Pagamento recusado. Verifique os dados do pagamento e tente novamente.",
-        )
-
-    proximo_pedido_id = (database.scalar(select(func.max(Pedido.id))) or 0) + 1
-
-    pedido = Pedido(
-        id=proximo_pedido_id,
-        cliente_id=cliente.id,
-        status=StatusPedido.PAGO,
-        valor_total=total_pedido,
-    )
-    database.add(pedido)
-    database.flush()
-
-    for item in itens_do_pedido:
-        produto = item["produto"]
-        quantidade = item["quantidade"]
-        subtotal = item["subtotal"]
-
-        produto.estoque -= quantidade
-
-        proximo_item_pedido_id = (database.scalar(select(func.max(ItemPedido.id))) or 0) + 1
-        item_pedido = ItemPedido(
-            id=proximo_item_pedido_id,
-            pedido_id=pedido.id,
-            produto_id=produto.id,
-            quantidade=quantidade,
-            preco_unitario=Decimal(str(produto.preco)),
-            subtotal=subtotal,
-        )
-        database.add(item_pedido)
-
-    database.commit()
-    database.refresh(pedido)
-
-    return {
-        "mensagem": "Pedido registrado com sucesso.",
-        "pedido": {
-            "id": pedido.id,
-            "status": pedido.status.value,
-            "valor_total": str(pedido.valor_total),
-            "metodo_pagamento": dados.metodo_pagamento,
-            "endereco": dados.endereco,
-            "criado_em": pedido.criado_em.isoformat() if pedido.criado_em else None,
-            "itens": [
-                {
-                    "produto_id": item["produto"].id,
-                    "nome": item["produto"].nome,
-                    "quantidade": item["quantidade"],
-                    "subtotal": str(item["subtotal"]),
-                }
-                for item in itens_do_pedido
-            ],
-        },
-    }
+        database.flush()
+        database.refresh(pedido)
+        resposta = {
+            "mensagem": "Pedido registrado com sucesso.",
+            "pedido": {
+                "id": pedido.id,
+                "status": pedido.status.value,
+                "valor_total": str(pedido.valor_total),
+                "metodo_pagamento": dados.metodo_pagamento,
+                "endereco": dados.endereco,
+                "criado_em": (
+                    pedido.criado_em.isoformat() if pedido.criado_em else None
+                ),
+                "itens": [
+                    {
+                        "produto_id": item["produto"].id,
+                        "nome": item["produto"].nome,
+                        "quantidade": item["quantidade"],
+                        "subtotal": str(item["subtotal"]),
+                    }
+                    for item in itens_do_pedido
+                ],
+            },
+        }
+        database.commit()
+        return resposta
+    except Exception:
+        database.rollback()
+        raise
 
 
 @router.get(
@@ -242,27 +250,10 @@ def finalizar_compra(
     summary="Listar pedidos do cliente",
 )
 def listar_pedidos_cliente(
-    email: str | None = Query(default=None),
-    cliente_id: int | None = Query(default=None),
     database: Session = Depends(get_database),
+    cliente: Cliente = Depends(exigir_cliente_autenticado),
 ):
-    """Retorna o histórico de pedidos do cliente informado."""
-
-    filtro_cliente = None
-
-    if cliente_id is not None:
-        filtro_cliente = Cliente.id == cliente_id
-    elif email:
-        filtro_cliente = Cliente.email == str(email).strip().lower()
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Informe cliente_id ou e-mail para consultar o histórico.",
-        )
-
-    cliente = database.scalar(select(Cliente).where(filtro_cliente))
-    if cliente is None:
-        return {"total": 0, "pedidos": []}
+    """Retorna o histórico do cliente autenticado."""
 
     pedidos = (
         database.execute(

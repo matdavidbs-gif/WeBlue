@@ -11,6 +11,7 @@ from ..services.security import (
     criar_token_acesso,
     extrair_jti,
     is_rate_limited,
+    obter_versao_autenticacao_cliente,
     register_failed_attempt,
     revogar_token,
     verificar_refresh_token_cliente,
@@ -101,11 +102,19 @@ def realizar_login(
 
     # Gera o JWT
     # Se "lembrar" for True, o token terá duração maior
+    versao_autenticacao = obter_versao_autenticacao_cliente(
+        database,
+        cliente.id,
+    )
     access_token = criar_token_acesso(
         cliente_id=cliente.id,
-        lembrar=dados.lembrar
+        lembrar=dados.lembrar,
+        versao_autenticacao=versao_autenticacao,
     )
-    refresh_token, refresh_jti = criar_refresh_token_cliente(cliente.id)
+    refresh_token, _ = criar_refresh_token_cliente(
+        cliente.id,
+        versao_autenticacao=versao_autenticacao,
+    )
 
     # Retorna o token e os dados básicos do cliente
     return {
@@ -135,7 +144,7 @@ def refresh_cliente(
             detail="Refresh token ausente."
         )
 
-    cliente_id = verificar_refresh_token_cliente(refresh_token)
+    cliente_id = verificar_refresh_token_cliente(refresh_token, database)
     if cliente_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -152,8 +161,19 @@ def refresh_cliente(
     jti_antigo = extrair_jti(refresh_token)
     revogar_token(jti_antigo)
 
-    novo_access_token = criar_token_acesso(cliente_id=cliente.id, lembrar=False)
-    novo_refresh_token, _ = criar_refresh_token_cliente(cliente.id)
+    versao_autenticacao = obter_versao_autenticacao_cliente(
+        database,
+        cliente.id,
+    )
+    novo_access_token = criar_token_acesso(
+        cliente_id=cliente.id,
+        lembrar=False,
+        versao_autenticacao=versao_autenticacao,
+    )
+    novo_refresh_token, _ = criar_refresh_token_cliente(
+        cliente.id,
+        versao_autenticacao=versao_autenticacao,
+    )
 
     return {
         "access_token": novo_access_token,

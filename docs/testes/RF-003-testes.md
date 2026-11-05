@@ -9,11 +9,14 @@ Validar o requisito funcional RF-003 — Recuperação de Senha do Cliente, veri
 ## 2. Ambiente de Teste
 
 - Backend: FastAPI
-- Banco de dados: MySQL
-- Frontend: HTML, CSS e JavaScript
-- Navegador: Google Chrome
+- Banco de dados automatizado: SQLite em memória
+- Envio SMTP: mock nos testes automatizados
 - Sistema operacional: Windows
-- Endpoint: POST /auth/recuperar-senha
+- Endpoints: POST /api/auth/solicitar-recuperacao e POST /api/auth/redefinir-senha
+
+Os resultados abaixo desta versão correspondem aos testes automatizados. As
+capturas de tela existentes devem ser atualizadas após configurar SMTP e
+validar o fluxo pelo navegador.
 
 ---
 
@@ -33,9 +36,10 @@ O sistema deve alterar a senha do cliente e apresentar uma mensagem de sucesso.
 
 **Resultado obtido:**
 
-Senha alterada com sucesso.
+O fluxo automatizado solicitou o link, redefiniu a senha e confirmou a senha
+antiga inválida e a nova senha válida.
 
-**Status:** APROVADO
+**Status:** Validado automaticamente
 
 **Evidência:**
 
@@ -59,7 +63,7 @@ O sistema apresentou a mensagem:
 
 "As senhas não coincidem."
 
-**Status:** APROVADO
+**Status:** Validado automaticamente
 
 **Evidência:**
 
@@ -79,11 +83,9 @@ O sistema deve rejeitar a nova senha.
 
 **Resultado obtido:**
 
-O sistema apresentou a mensagem:
+A API rejeitou a senha fora da política definida.
 
-"A nova senha não atende aos critérios de segurança."
-
-**Status:** APROVADO
+**Status:** Validado automaticamente
 
 **Evidência:**
 
@@ -99,13 +101,13 @@ Informar um endereço de e-mail que não esteja cadastrado no sistema.
 
 **Resultado esperado:**
 
-O sistema não deve alterar nenhuma senha e deve informar que o cliente não foi encontrado.
+O sistema não deve alterar nenhuma senha e deve apresentar a mesma resposta genérica usada para um e-mail cadastrado.
 
 **Resultado obtido:**
 
-O sistema recusou a recuperação para o e-mail não cadastrado.
+O sistema não revelou se o e-mail está cadastrado.
 
-**Status:** APROVADO
+**Status:** Validado automaticamente
 
 **Evidência:**
 
@@ -125,9 +127,9 @@ O sistema deve permitir o login com a nova senha.
 
 **Resultado obtido:**
 
-O login foi realizado com sucesso utilizando a senha atualizada.
+A verificação automatizada confirmou o hash da nova senha e a rejeição da antiga.
 
-**Status:** APROVADO
+**Status:** Validado automaticamente
 
 **Evidência:**
 
@@ -137,8 +139,7 @@ O login foi realizado com sucesso utilizando a senha atualizada.
 
 ## 4. Resultado Final
 
-Todos os casos de teste executados para o RF-003 foram aprovados.
-
-O sistema permite a recuperação da senha, realiza as validações necessárias e atualiza corretamente a senha armazenada no banco de dados.
-
-**Status final do RF-003: APROVADO**
+Os testes automatizados verificam token armazenado como hash, uso único,
+expiração, invalidação de links anteriores, política da senha, resposta uniforme
+para e-mail inexistente e falha de entrega. Eles não enviam e-mail real nem
+substituem a validação de SMTP configurado no ambiente de deploy.

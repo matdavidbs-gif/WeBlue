@@ -32,9 +32,10 @@ Laboratório de Inovação III.
 
 ### RF-003 — Recuperação de Senha
 - Tela de recuperação implementada
-- Validação da nova senha
-- Fluxo de recuperação em desenvolvimento
-- Token temporário de recuperação: pendente
+- Envio de link temporário por SMTP
+- Token aleatório de uso único, armazenado no banco somente como hash
+- Validação da nova senha e confirmação
+- Sessões de cliente existentes são invalidadas após a redefinição
 
 ### Perfil do Cliente
 - Exibição de nome
@@ -63,7 +64,27 @@ MySQL
 - Validação de dados no frontend e backend
 - Arquivos de ambiente protegidos pelo `.gitignore`
 - Token de autenticação: em desenvolvimento
-- Token de recuperação de senha: pendente
+- Token de recuperação expira em 15 minutos e não pode ser reutilizado
+- A redefinição invalida tokens de acesso e de renovação já emitidos ao cliente
+
+### Configuração do e-mail de recuperação
+
+Configure estas variáveis no ambiente do backend (ou no `.env` local, que não
+deve ser enviado ao repositório):
+
+```text
+SMTP_HOST=
+SMTP_PORT=465
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_FROM_EMAIL=
+FRONTEND_BASE_URL=https://seu-dominio
+```
+
+O envio utiliza SMTP com TLS implícito. `SMTP_USERNAME` e `SMTP_PASSWORD`
+devem ser informados juntos; `FRONTEND_BASE_URL` deve ser a origem pública
+onde a página `/recuperar-senha` está hospedada. Sem essa configuração, a API
+responde com indisponibilidade para solicitações de recuperação.
 
 ## Localização dos Artefatos
 
@@ -74,6 +95,6 @@ MySQL
 - **Cadastro:** Concluído
 - **Login:** Concluído
 - **Perfil:** Implementado
-- **Recuperação de senha:** Parcial
+- **Recuperação de senha:** Implementada; requer configuração SMTP no deploy
 - **Deploy Railway:** Em desenvolvimento
 - **Demonstração:** Pendente

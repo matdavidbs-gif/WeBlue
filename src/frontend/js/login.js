@@ -359,9 +359,14 @@ formLogin.addEventListener(
 
             setTimeout(
                 () => {
+                    const destino =
+                        sessionStorage.getItem("redirecionarAposLogin");
 
+                    sessionStorage.removeItem("redirecionarAposLogin");
                     window.location.href =
-                        "/cliente";
+                        ["/checkout", "/pedidos"].includes(destino)
+                            ? destino
+                            : "/cliente";
 
                 },
                 800

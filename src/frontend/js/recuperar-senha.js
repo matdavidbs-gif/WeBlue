@@ -43,6 +43,18 @@ const API_SOLICITAR_RECUPERACAO =
 const API_REDEFINIR_SENHA =
     "/api/auth/redefinir-senha";
 
+const tokenDoLink =
+    new URLSearchParams(window.location.hash.slice(1)).get("token");
+
+if (tokenDoLink) {
+    campoToken.value = tokenDoLink;
+    window.history.replaceState(
+        null,
+        "",
+        window.location.pathname
+    );
+}
+
 
 // ============================================================
 // MOSTRAR / OCULTAR SENHA
@@ -190,7 +202,7 @@ if (botaoSolicitarToken) {
                 true;
 
             botaoSolicitarToken.textContent =
-                "Gerando token...";
+                "Enviando link...";
 
 
             try {
@@ -237,31 +249,17 @@ if (botaoSolicitarToken) {
                 }
 
 
-                // =============================================
-                // SEGURANÇA
-                // =============================================
-                //
-                // O token de recuperação não deve ser exposto
-                // na resposta HTTP. Em produção ele seria enviado
-                // por e-mail ou por um canal seguro.
-                // =============================================
-
-                // Sem token na resposta, o cliente precisa receber
-                // o código por e-mail ou outro canal seguro.
                 campoToken.value = "";
-
 
                 // =============================================
                 // SUCESSO
                 // =============================================
 
                 exibirMensagem(
-                    "Se o e-mail estiver cadastrado, um token de recuperação foi enviado por canal seguro. Verifique seu e-mail e continue com a redefinição da senha.",
+                    dados.mensagem ||
+                    "Se o e-mail estiver cadastrado, enviaremos um link de recuperação. Verifique sua caixa de entrada.",
                     "sucesso"
                 );
-
-
-                campoToken.focus();
 
 
             } catch (erro) {
@@ -286,7 +284,7 @@ if (botaoSolicitarToken) {
                     false;
 
                 botaoSolicitarToken.textContent =
-                    "Gerar token";
+                    "Enviar link de recuperação";
             }
         }
     );
@@ -308,9 +306,6 @@ form.addEventListener(
         // ====================================================
         // DADOS INFORMADOS PELO CLIENTE
         // ====================================================
-
-        const email =
-            campoEmail.value.trim();
 
         const token =
             campoToken.value.trim();
@@ -335,7 +330,6 @@ form.addEventListener(
         // ====================================================
 
         if (
-            !email ||
             !token ||
             !novaSenha ||
             !confirmarSenha
@@ -345,23 +339,6 @@ form.addEventListener(
                 "Preencha todos os campos.",
                 "erro"
             );
-
-            return;
-        }
-
-
-        // ====================================================
-        // VALIDAR E-MAIL
-        // ====================================================
-
-        if (!emailValido(email)) {
-
-            exibirMensagem(
-                "Informe um e-mail válido.",
-                "erro"
-            );
-
-            campoEmail.focus();
 
             return;
         }
@@ -429,9 +406,6 @@ form.addEventListener(
                     },
 
                     body: JSON.stringify({
-
-                        email: email,
-
                         token: token,
 
                         nova_senha:

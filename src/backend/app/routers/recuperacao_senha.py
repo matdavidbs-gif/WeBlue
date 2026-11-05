@@ -1,47 +1,53 @@
+import logging
+import smtplib
+from datetime import UTC, datetime, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from sqlalchemy import select
+from sqlalchemy import delete, select, update
 from sqlalchemy.orm import Session
 
 from ..database import get_database
 from ..models.cliente import Cliente
-
+from ..models.cliente_versao_autenticacao import ClienteVersaoAutenticacao
+from ..models.token_recuperacao_senha import TokenRecuperacaoSenha
 from ..schemas.recuperacao_senha import (
+    RedefinirSenhaRequest,
     SolicitarRecuperacaoRequest,
-    RedefinirSenhaRequest
 )
-
-from ..services.security import (
-    clear_attempts,
-    criar_hash_senha,
+from ..services.recuperacao_senha import (
+    EmailRecuperacaoNaoConfigurado,
     criar_token_recuperacao,
+    enviar_email_recuperacao,
+    hash_token_recuperacao,
+    validar_configuracao_email,
+)
+from ..services.security import (
+    criar_hash_senha,
     is_rate_limited,
     register_failed_attempt,
-    verificar_token_recuperacao,
 )
 
 
-router = APIRouter(
-    tags=["Autenticação"]
+logger = logging.getLogger(__name__)
+router = APIRouter(tags=["Autenticação"])
+TEMPO_EXPIRACAO_MINUTOS = 15
+MENSAGEM_SOLICITACAO = (
+    "Se o e-mail estiver cadastrado, enviaremos um link de recuperação. "
+    "Verifique sua caixa de entrada."
 )
 
-
-# ==========================================
-# ETAPA 1 - SOLICITAR RECUPERAÇÃO
-# ==========================================
 
 @router.post(
     "/solicitar-recuperacao",
     status_code=status.HTTP_200_OK,
-    summary="Solicitar recuperação de senha"
+    summary="Solicitar recuperação de senha",
 )
 def solicitar_recuperacao(
     request: Request,
     dados: SolicitarRecuperacaoRequest,
-    database: Session = Depends(get_database)
+    database: Session = Depends(get_database),
 ):
-
-    email = str(dados.email)
-
+    email = str(dados.email).strip().lower()
     permitido, retry_after = is_rate_limited(
         request,
         email,
@@ -49,93 +55,135 @@ def solicitar_recuperacao(
         max_attempts=3,
         window_seconds=900,
     )
-
     if not permitido:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail=f"Muitas tentativas de recuperação. Tente novamente em {retry_after} segundos."
+            detail=(
+                "Muitas solicitações de recuperação. "
+                f"Tente novamente em {retry_after} segundos."
+            ),
         )
+    register_failed_attempt(request, email, prefix="recuperacao_cliente")
 
-    consulta = select(Cliente).where(
-        Cliente.email == email
-    )
-
-    cliente = database.scalar(consulta)
-
-    if cliente is None:
-        register_failed_attempt(request, email, prefix="recuperacao_cliente")
+    try:
+        validar_configuracao_email()
+    except EmailRecuperacaoNaoConfigurado as erro:
+        logger.error("O envio de recuperação de senha não está configurado.")
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Cliente não encontrado."
-        )
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="A recuperação de senha está temporariamente indisponível.",
+        ) from erro
 
-    criar_token_recuperacao(
-        cliente.email
+    agora = datetime.now(UTC).replace(tzinfo=None)
+    database.execute(
+        delete(TokenRecuperacaoSenha).where(
+            TokenRecuperacaoSenha.expira_em <= agora
+        )
     )
-    clear_attempts(request, email, prefix="recuperacao_cliente")
+    cliente = database.scalar(
+        select(Cliente).where(Cliente.email == email)
+    )
+    if cliente is None:
+        database.commit()
+        return {"mensagem": MENSAGEM_SOLICITACAO}
 
-    return {
-        "mensagem": (
-            "Se o e-mail estiver cadastrado, "
-            "um link de recuperação foi enviado. "
-            "Use o token recebido por e-mail para redefinir a senha."
+    token, token_hash = criar_token_recuperacao()
+    database.execute(
+        update(TokenRecuperacaoSenha)
+        .where(
+            TokenRecuperacaoSenha.cliente_id == cliente.id,
+            TokenRecuperacaoSenha.usado_em.is_(None),
         )
-    }
+        .values(usado_em=agora)
+    )
+    registro = TokenRecuperacaoSenha(
+        cliente_id=cliente.id,
+        token_hash=token_hash,
+        expira_em=agora + timedelta(minutes=TEMPO_EXPIRACAO_MINUTOS),
+    )
+    database.add(registro)
+    database.commit()
 
+    try:
+        enviar_email_recuperacao(cliente.email, token)
+    except (smtplib.SMTPException, OSError):
+        logger.exception("Falha ao enviar e-mail de recuperação.")
+        registro.usado_em = datetime.now(UTC).replace(tzinfo=None)
+        database.commit()
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Não foi possível enviar o e-mail de recuperação. Tente novamente.",
+        )
 
-# ==========================================
-# ETAPA 2 - REDEFINIR SENHA
-# ==========================================
+    return {"mensagem": MENSAGEM_SOLICITACAO}
+
 
 @router.post(
     "/redefinir-senha",
     status_code=status.HTTP_200_OK,
-    summary="Redefinir senha do cliente"
+    summary="Redefinir senha do cliente",
 )
 def redefinir_senha(
     dados: RedefinirSenhaRequest,
-    database: Session = Depends(get_database)
+    database: Session = Depends(get_database),
 ):
-
-    email = str(dados.email)
-
-    # Verifica se o token é válido
-    token_valido = verificar_token_recuperacao(
-        dados.token,
-        email
+    agora = datetime.now(UTC).replace(tzinfo=None)
+    token_hash = hash_token_recuperacao(dados.token)
+    registro = database.scalar(
+        select(TokenRecuperacaoSenha)
+        .where(TokenRecuperacaoSenha.token_hash == token_hash)
+        .with_for_update()
     )
 
-    if not token_valido:
+    if (
+        registro is None
+        or registro.usado_em is not None
+        or registro.expira_em <= agora
+    ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token inválido ou expirado."
+            detail="Token inválido, expirado ou já utilizado.",
         )
 
-    # Procura o cliente no banco
-    consulta = select(Cliente).where(
-        Cliente.email == email
+    consumo = database.execute(
+        update(TokenRecuperacaoSenha)
+        .where(
+            TokenRecuperacaoSenha.id == registro.id,
+            TokenRecuperacaoSenha.usado_em.is_(None),
+            TokenRecuperacaoSenha.expira_em > agora,
+        )
+        .values(usado_em=agora)
     )
-
-    cliente = database.scalar(consulta)
-
-    if cliente is None:
+    if consumo.rowcount != 1:
+        database.rollback()
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Cliente não encontrado."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido, expirado ou já utilizado.",
         )
 
-    # Cria o hash da nova senha
-    cliente.senha_hash = criar_hash_senha(
-        dados.nova_senha
-    )
+    cliente = database.get(Cliente, registro.cliente_id)
+    if cliente is None:
+        database.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido, expirado ou já utilizado.",
+        )
 
-    # Salva a nova senha no MySQL
+    cliente.senha_hash = criar_hash_senha(dados.nova_senha)
+    versao_autenticacao = database.get(
+        ClienteVersaoAutenticacao,
+        cliente.id,
+    )
+    if versao_autenticacao is None:
+        versao_autenticacao = ClienteVersaoAutenticacao(
+            cliente_id=cliente.id,
+            versao=1,
+        )
+        database.add(versao_autenticacao)
+    else:
+        versao_autenticacao.versao += 1
     database.commit()
-    database.refresh(cliente)
 
     return {
-        "mensagem": (
-            "Senha alterada com sucesso. "
-            "Você já pode realizar o login."
-        )
+        "mensagem": "Senha alterada com sucesso. Você já pode realizar o login."
     }

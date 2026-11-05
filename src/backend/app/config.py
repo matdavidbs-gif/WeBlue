@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from pydantic import EmailStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -22,6 +23,18 @@ class Settings(BaseSettings):
     jwt_secret_key: str
     jwt_algorithm: str = "HS256"
     jwt_expire_minutes: int = 30
+
+    # =========================
+    # E-MAIL DE RECUPERAÇÃO
+    # =========================
+
+    smtp_host: str | None = None
+    smtp_port: int = 465
+    smtp_username: str | None = None
+    smtp_password: str | None = None
+    smtp_from_email: EmailStr | None = None
+    frontend_base_url: str | None = None
+    smtp_timeout_seconds: int = 10
 
     # =========================
     # ARQUIVO .ENV

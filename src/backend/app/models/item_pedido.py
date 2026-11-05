@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Numeric
+from sqlalchemy import ForeignKey, Integer, Numeric
 from sqlalchemy.dialects.mysql import BIGINT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -13,7 +13,7 @@ class ItemPedido(Base):
     __tablename__ = "itens_pedido"
 
     id: Mapped[int] = mapped_column(
-        BIGINT(unsigned=True),
+        BIGINT(unsigned=True).with_variant(Integer, "sqlite"),
         primary_key=True,
         autoincrement=True
     )

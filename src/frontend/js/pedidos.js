@@ -2,15 +2,11 @@
 // WEBLUE - PEDIDOS
 // ============================================================
 //
-// Esta tela consulta o histórico de compras do cliente.
-// Como a aplicação ainda é simples, seguimos com busca por e-mail.
+// Esta tela consulta o histórico associado à conta autenticada.
 // ============================================================
 
-const CHAVE_EMAIL = "weblue-ultimo-email";
-const emailPedido = document.getElementById("emailPedido");
 const listaPedidos = document.getElementById("listaPedidos");
 const mensagemPedidos = document.getElementById("mensagemPedidos");
-const botaoBuscarPedidos = document.getElementById("botaoBuscarPedidos");
 
 function formatarPreco(valor) {
     return new Intl.NumberFormat("pt-BR", {
@@ -37,22 +33,29 @@ function renderPedido(pedido) {
     `;
 }
 
-async function buscarPedidos(email) {
-    if (!email) {
-        if (mensagemPedidos) {
-            mensagemPedidos.textContent = "Informe o e-mail para consultar seus pedidos.";
-        }
-        if (listaPedidos) {
-            listaPedidos.innerHTML = "";
-        }
+async function buscarPedidos() {
+    const token = sessionStorage.getItem("tokenWeblue");
+    if (!token) {
+        sessionStorage.setItem("redirecionarAposLogin", "/pedidos");
+        window.location.href = "/login";
         return;
     }
 
     try {
-        const resposta = await fetch(`/api/pedidos/me?email=${encodeURIComponent(email)}`);
+        const resposta = await fetch("/api/pedidos/me", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
         const dados = await resposta.json();
 
         if (!resposta.ok) {
+            if (resposta.status === 401) {
+                sessionStorage.removeItem("tokenWeblue");
+                sessionStorage.setItem("redirecionarAposLogin", "/pedidos");
+                window.location.href = "/login";
+                return;
+            }
             throw new Error(dados.detail || "Não foi possível carregar os pedidos.");
         }
 
@@ -63,7 +66,7 @@ async function buscarPedidos(email) {
                 listaPedidos.innerHTML = "";
             }
             if (mensagemPedidos) {
-                mensagemPedidos.textContent = "Nenhum pedido encontrado para este e-mail.";
+                mensagemPedidos.textContent = "Sua conta ainda não possui pedidos.";
             }
             return;
         }
@@ -83,41 +86,4 @@ async function buscarPedidos(email) {
     }
 }
 
-if (emailPedido) {
-    const emailSalvo = localStorage.getItem(CHAVE_EMAIL);
-    if (emailSalvo) {
-        emailPedido.value = emailSalvo;
-    }
-}
-
-if (botaoBuscarPedidos) {
-    botaoBuscarPedidos.addEventListener("click", () => {
-        if (emailPedido) {
-            const valor = emailPedido.value.trim();
-            localStorage.setItem(CHAVE_EMAIL, valor);
-            buscarPedidos(valor);
-        }
-    });
-}
-
-if (emailPedido) {
-    emailPedido.addEventListener("keydown", (evento) => {
-        if (evento.key === "Enter") {
-            const valor = emailPedido.value.trim();
-            localStorage.setItem(CHAVE_EMAIL, valor);
-            buscarPedidos(valor);
-        }
-    });
-}
-
-if (emailPedido && emailPedido.value.trim()) {
-    buscarPedidos(emailPedido.value.trim());
-} else {
-    const emailSalvo = localStorage.getItem(CHAVE_EMAIL);
-    if (emailSalvo) {
-        emailPedido.value = emailSalvo;
-        buscarPedidos(emailSalvo);
-    } else if (mensagemPedidos) {
-        mensagemPedidos.textContent = "Ainda não há pedidos para consultar. Faça uma compra primeiro.";
-    }
-}
+buscarPedidos();

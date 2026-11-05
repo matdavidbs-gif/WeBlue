@@ -9,8 +9,6 @@
 # e evitar que o backend aceite dados inválidos.
 # ============================================================
 
-from decimal import Decimal
-
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -24,10 +22,6 @@ class ItemCarrinhoRequest(BaseModel):
 class CheckoutRequest(BaseModel):
     """Dados enviados ao finalizar a compra."""
 
-    cliente_id: int | None = None
-    nome: str | None = Field(default=None, min_length=2, max_length=150)
-    email: str | None = Field(default=None, min_length=3, max_length=254)
-    telefone: str | None = Field(default=None, min_length=8, max_length=20)
     endereco: str = Field(min_length=5, max_length=250)
     metodo_pagamento: str = Field(default="PIX")
     numero_cartao: str | None = Field(default=None, max_length=40)

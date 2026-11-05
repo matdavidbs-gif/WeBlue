@@ -6,8 +6,10 @@ from threading import Lock
 
 import jwt
 from pwdlib import PasswordHash
+from sqlalchemy.orm import Session
 
 from ..config import settings
+from ..models.cliente_versao_autenticacao import ClienteVersaoAutenticacao
 
 
 password_hash = PasswordHash.recommended()
@@ -115,6 +117,14 @@ def verificar_senha(
     )
 
 
+def obter_versao_autenticacao_cliente(
+    database: Session,
+    cliente_id: int,
+) -> int:
+    estado = database.get(ClienteVersaoAutenticacao, cliente_id)
+    return estado.versao if estado is not None else 0
+
+
 # =========================
 # TOKEN DE ACESSO
 # =========================
@@ -122,7 +132,8 @@ def verificar_senha(
 def criar_token_acesso(
     cliente_id: int,
     lembrar: bool = False,
-    jti: str | None = None
+    jti: str | None = None,
+    versao_autenticacao: int = 0,
 ) -> str:
     """Cria um token JWT para o cliente autenticado."""
 
@@ -142,6 +153,7 @@ def criar_token_acesso(
         "nbf": int(agora.timestamp()),
         "exp": int(expiracao.timestamp()),
         "jti": jti or str(uuid.uuid4()),
+        "ver": versao_autenticacao,
     }
 
     token = jwt.encode(
@@ -153,7 +165,10 @@ def criar_token_acesso(
     return token
 
 
-def criar_refresh_token_cliente(cliente_id: int) -> tuple[str, str]:
+def criar_refresh_token_cliente(
+    cliente_id: int,
+    versao_autenticacao: int = 0,
+) -> tuple[str, str]:
     """Cria um refresh token e seu identificador de sessão."""
 
     agora = datetime.now(timezone.utc)
@@ -167,6 +182,7 @@ def criar_refresh_token_cliente(cliente_id: int) -> tuple[str, str]:
         "nbf": int(agora.timestamp()),
         "exp": int(expiracao.timestamp()),
         "jti": jti,
+        "ver": versao_autenticacao,
     }
     token = jwt.encode(dados_token, SECRET_KEY, algorithm=ALGORITHM)
     return token, jti
@@ -204,7 +220,8 @@ def token_foi_revogado(jti: str | None) -> bool:
 # =========================
 
 def verificar_token_acesso(
-    token: str
+    token: str,
+    database: Session | None = None,
 ) -> int | None:
     """
     Valida o token de acesso.
@@ -239,7 +256,13 @@ def verificar_token_acesso(
         if cliente_id is None:
             return None
 
-        return int(cliente_id)
+        cliente_id = int(cliente_id)
+        if database is not None and int(dados_token.get("ver", 0)) != (
+            obter_versao_autenticacao_cliente(database, cliente_id)
+        ):
+            return None
+
+        return cliente_id
 
     except (
         jwt.InvalidTokenError,
@@ -250,7 +273,10 @@ def verificar_token_acesso(
         return None
 
 
-def verificar_refresh_token_cliente(token: str) -> int | None:
+def verificar_refresh_token_cliente(
+    token: str,
+    database: Session | None = None,
+) -> int | None:
     """Valida refresh token do cliente e rejeita tokens revogados."""
 
     try:
@@ -278,7 +304,13 @@ def verificar_refresh_token_cliente(token: str) -> int | None:
         if cliente_id is None:
             return None
 
-        return int(cliente_id)
+        cliente_id = int(cliente_id)
+        if database is not None and int(dados_token.get("ver", 0)) != (
+            obter_versao_autenticacao_cliente(database, cliente_id)
+        ):
+            return None
+
+        return cliente_id
     except (
         jwt.InvalidTokenError,
         ValueError,
@@ -286,82 +318,3 @@ def verificar_refresh_token_cliente(token: str) -> int | None:
         KeyError,
     ):
         return None
-
-
-# =========================
-# TOKEN DE RECUPERAÇÃO
-# =========================
-
-def criar_token_recuperacao(
-    email: str
-) -> str:
-    """
-    Cria um token temporário para
-    recuperação de senha.
-    """
-
-    agora = datetime.now(timezone.utc)
-
-    expiracao = agora + timedelta(
-        minutes=15
-    )
-
-    dados_token = {
-        "sub": email,
-        "tipo": "recuperacao_senha",
-        "iss": JWT_ISSUER,
-        "iat": int(agora.timestamp()),
-        "nbf": int(agora.timestamp()),
-        "exp": int(expiracao.timestamp())
-    }
-
-    token = jwt.encode(
-        dados_token,
-        SECRET_KEY,
-        algorithm=ALGORITHM
-    )
-
-    return token
-
-
-# =========================
-# VALIDAÇÃO DO TOKEN
-# DE RECUPERAÇÃO
-# =========================
-
-def verificar_token_recuperacao(
-    token: str,
-    email: str
-) -> bool:
-    """
-    Verifica se o token de recuperação
-    é válido e pertence ao e-mail informado.
-    """
-
-    try:
-        dados_token = jwt.decode(
-            token,
-            SECRET_KEY,
-            algorithms=[ALGORITHM],
-            issuer=JWT_ISSUER,
-            options={
-                "require": ["sub", "tipo", "iat", "exp", "iss", "nbf"],
-                "verify_exp": True,
-                "verify_iat": True,
-                "verify_nbf": True,
-            }
-        )
-
-        email_token = dados_token.get("sub")
-        tipo_token = dados_token.get("tipo")
-
-        if tipo_token != "recuperacao_senha":
-            return False
-
-        if email_token != email:
-            return False
-
-        return True
-
-    except (jwt.InvalidTokenError, ValueError, TypeError, KeyError):
-        return False

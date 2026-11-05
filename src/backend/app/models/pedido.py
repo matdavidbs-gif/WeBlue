@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, Enum as SQLAlchemyEnum, ForeignKey, Numeric, text
+from sqlalchemy import DateTime, Enum as SQLAlchemyEnum, ForeignKey, Integer, Numeric, text
 from sqlalchemy.dialects.mysql import BIGINT
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -29,7 +29,7 @@ class Pedido(Base):
     __tablename__ = "pedidos"
 
     id: Mapped[int] = mapped_column(
-        BIGINT(unsigned=True),
+        BIGINT(unsigned=True).with_variant(Integer, "sqlite"),
         primary_key=True,
         autoincrement=True
     )

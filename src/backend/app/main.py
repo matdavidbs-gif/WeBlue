@@ -79,6 +79,7 @@ from .database import (
 
 # Model da tabela clientes.
 from .models.cliente import Cliente
+from .models.cliente_versao_autenticacao import ClienteVersaoAutenticacao
 
 # Model da tabela produtos.
 from .models.produto import Produto
@@ -89,6 +90,7 @@ from .models.administrador import Administrador
 # Modelos das tabelas de pedidos.
 from .models.item_pedido import ItemPedido
 from .models.pedido import Pedido
+from .models.token_recuperacao_senha import TokenRecuperacaoSenha
 
 
 # ============================================================

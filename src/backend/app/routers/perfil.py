@@ -126,7 +126,7 @@ def consultar_perfil(
     # verificar_token_acesso() valida o JWT.
     #
     # Se estiver correto, esperamos receber o ID do cliente.
-    cliente_id = verificar_token_acesso(token)
+    cliente_id = verificar_token_acesso(token, database)
 
 
     # Se não foi possível recuperar um cliente pelo token,
@@ -239,7 +239,7 @@ def atualizar_perfil(
     # 2. VALIDAR TOKEN
     # ========================================================
 
-    cliente_id = verificar_token_acesso(token)
+    cliente_id = verificar_token_acesso(token, database)
 
 
     if cliente_id is None:
