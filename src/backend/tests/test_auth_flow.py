@@ -17,7 +17,9 @@ from app.models.cliente_versao_autenticacao import ClienteVersaoAutenticacao
 from app.models.item_pedido import ItemPedido
 from app.models.pedido import Pedido
 from app.models.produto import Produto
+from app.models.rate_limit_window import RateLimitWindow
 from app.models.token_recuperacao_senha import TokenRecuperacaoSenha
+from app.models.token_revogado import TokenRevogado
 from app.config import settings
 from app.routers import recuperacao_senha as recovery_router
 from app.services.admin_security import criar_hash_senha_admin
@@ -25,7 +27,9 @@ from app.services.security import (
     criar_hash_senha,
     criar_refresh_token_cliente,
     criar_token_acesso,
+    revogar_token,
     verificar_senha,
+    verificar_token_acesso,
 )
 from app.services import recuperacao_senha as recovery_service
 
@@ -50,10 +54,14 @@ def database_session():
     Administrador.__table__.create(bind=engine, checkfirst=True)
     Produto.__table__.create(bind=engine, checkfirst=True)
     TokenRecuperacaoSenha.__table__.create(bind=engine, checkfirst=True)
+    RateLimitWindow.__table__.create(bind=engine, checkfirst=True)
+    TokenRevogado.__table__.create(bind=engine, checkfirst=True)
 
     session = TestingSessionLocal()
     try:
         session.query(TokenRecuperacaoSenha).delete()
+        session.query(RateLimitWindow).delete()
+        session.query(TokenRevogado).delete()
         session.query(ClienteVersaoAutenticacao).delete()
         session.query(Cliente).delete()
         session.query(Administrador).delete()
@@ -192,6 +200,42 @@ def test_admin_products_require_valid_token(database_session, client_app):
     )
     assert resposta_com_token.status_code == 200
     assert "produtos" in resposta_com_token.json()
+
+
+def test_login_rate_limit_is_shared_between_database_sessions(
+    database_session, client_app
+):
+    for _ in range(5):
+        response = client_app.post(
+            "/api/auth/login",
+            json={"email": "tentativas@weblue.com", "senha": "SenhaIncorreta123"},
+        )
+        assert response.status_code == 401
+
+    limited_response = client_app.post(
+        "/api/auth/login",
+        json={"email": "tentativas@weblue.com", "senha": "SenhaIncorreta123"},
+    )
+
+    assert limited_response.status_code == 429
+
+    outra_sessao = TestingSessionLocal()
+    try:
+        assert outra_sessao.query(RateLimitWindow).count() == 1
+    finally:
+        outra_sessao.close()
+
+
+def test_revoked_access_token_is_rejected_from_another_session(database_session):
+    token = criar_token_acesso(cliente_id=999)
+    revogar_token(token, database_session)
+
+    outra_sessao = TestingSessionLocal()
+    try:
+        assert verificar_token_acesso(token, outra_sessao) is None
+        assert outra_sessao.query(TokenRevogado).count() == 1
+    finally:
+        outra_sessao.close()
 
 
 def _criar_cliente_recuperacao(

@@ -41,13 +41,13 @@ import jwt
 # Biblioteca utilizada pelo projeto para gerar
 # e verificar hashes de senha.
 from pwdlib import PasswordHash
+from sqlalchemy.orm import Session
 
 # Configurações gerais da aplicação.
 from ..config import settings
+from .security import revogar_token, token_foi_revogado
 
 JWT_ISSUER = "weblue"
-
-_REVOKED_JTIS: set[str] = set()
 
 REFRESH_TOKEN_DIAS = 7
 
@@ -214,21 +214,13 @@ def extrair_jti(token: str) -> str | None:
         return None
 
 
-def revogar_token(jti: str | None) -> None:
-    if jti:
-        _REVOKED_JTIS.add(jti)
-
-
-def token_foi_revogado(jti: str | None) -> bool:
-    return bool(jti and jti in _REVOKED_JTIS)
-
-
 # ============================================================
 # VERIFICAR TOKEN JWT DO ADMINISTRADOR
 # ============================================================
 
 def verificar_token_admin(
-    token: str
+    token: str,
+    database: Session,
 ) -> int | None:
     """
     Valida um token administrativo.
@@ -262,7 +254,7 @@ def verificar_token_admin(
             return None
 
         jti = dados_token.get("jti")
-        if token_foi_revogado(jti):
+        if token_foi_revogado(jti, database):
             return None
 
         administrador_id = dados_token.get("sub")
@@ -280,7 +272,7 @@ def verificar_token_admin(
         return None
 
 
-def verificar_refresh_token_admin(token: str) -> int | None:
+def verificar_refresh_token_admin(token: str, database: Session) -> int | None:
     """Valida refresh token do administrador e rejeita tokens revogados."""
 
     try:
@@ -301,7 +293,7 @@ def verificar_refresh_token_admin(token: str) -> int | None:
             return None
 
         jti = dados_token.get("jti")
-        if token_foi_revogado(jti):
+        if token_foi_revogado(jti, database):
             return None
 
         administrador_id = dados_token.get("sub")

@@ -192,28 +192,19 @@ const totalEstoque = document.getElementById("totalEstoque");
 let produtos = [];
 
 
-/* ============================================================
-   4. ESCAPAR HTML
-   ============================================================ */
-
-/*
-   Como alguns valores vêm do banco de dados,
-   não devemos inseri-los diretamente no HTML.
-
-   Esta função transforma caracteres especiais em texto seguro.
-*/
-function escaparHtml(valor) {
-
-    if (valor === null || valor === undefined) {
-        return "";
+function criarElementoTexto(tag, classe, texto) {
+    const elemento = document.createElement(tag);
+    if (classe) {
+        elemento.className = classe;
     }
+    elemento.textContent = String(texto ?? "");
+    return elemento;
+}
 
-    return String(valor)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+function mostrarEstadoLista(container, texto, classe = "sem-produtos") {
+    if (container) {
+        container.replaceChildren(criarElementoTexto("p", classe, texto));
+    }
 }
 
 
@@ -338,11 +329,7 @@ async function obterMensagemErro(response) {
 
 async function carregarProdutos() {
 
-    listaProdutos.innerHTML = `
-        <p class="carregando">
-            Carregando produtos...
-        </p>
-    `;
+    mostrarEstadoLista(listaProdutos, "Carregando produtos...", "carregando");
 
     try {
        const response = await requisitarComRefreshAdmin(API_PRODUTOS, {
@@ -365,11 +352,7 @@ async function carregarProdutos() {
 
     } catch (erro) {
        console.error("Erro ao carregar produtos:", erro);
-       listaProdutos.innerHTML = `
-            <p class="sem-produtos">
-                Não foi possível carregar os produtos.
-            </p>
-       `;
+       mostrarEstadoLista(listaProdutos, "Não foi possível carregar os produtos.");
 
        mostrarMensagem(
            erro.message || "Não foi possível carregar os produtos.",
@@ -404,24 +387,32 @@ async function carregarResumoAdmin() {
        const itensRecentes = pedidos.slice(0, 3);
        if (listaPedidosRecentes) {
            if (!itensRecentes.length) {
-               listaPedidosRecentes.innerHTML = '<p class="sem-produtos">Nenhum pedido registrado.</p>';
+               mostrarEstadoLista(listaPedidosRecentes, "Nenhum pedido registrado.");
            } else {
-               listaPedidosRecentes.innerHTML = itensRecentes.map((pedido) => {
+               const fragmento = document.createDocumentFragment();
+               itensRecentes.forEach((pedido) => {
                    const valor = Number(pedido.valor_total || 0);
                    const data = pedido.criado_em ? new Date(pedido.criado_em).toLocaleString("pt-BR") : "-";
                    const itens = (pedido.itens || [])
                        .slice(0, 2)
-                       .map((item) => `${item.quantidade}x ${item.nome}`).join(", ");
-                   return `
-                       <div class="admin-item-resumo">
-                           <strong>#${pedido.id}</strong>
-                           <span>${pedido.status}</span>
-                           <small>${data}</small>
-                           <small>${itens || "Sem itens"}</small>
-                           <strong>${valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</strong>
-                       </div>
-                   `;
-               }).join("");
+                       .map((item) => `${item.quantidade}x ${item.nome || "Produto"}`).join(", ");
+
+                   const linha = document.createElement("div");
+                   linha.className = "admin-item-resumo";
+                   linha.append(
+                       criarElementoTexto("strong", "", `#${pedido.id}`),
+                       criarElementoTexto("span", "", pedido.status || "Indefinido"),
+                       criarElementoTexto("small", "", data),
+                       criarElementoTexto("small", "", itens || "Sem itens"),
+                       criarElementoTexto(
+                           "strong",
+                           "",
+                           valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
+                       )
+                   );
+                   fragmento.appendChild(linha);
+               });
+               listaPedidosRecentes.replaceChildren(fragmento);
            }
        }
 
@@ -431,24 +422,29 @@ async function carregarResumoAdmin() {
 
        if (listaEstoqueBaixo) {
            if (!estoqueBaixo.length) {
-               listaEstoqueBaixo.innerHTML = '<p class="sem-produtos">Estoque saudável para todos os produtos.</p>';
+               mostrarEstadoLista(listaEstoqueBaixo, "Estoque saudável para todos os produtos.");
            } else {
-               listaEstoqueBaixo.innerHTML = estoqueBaixo.map((produto) => `
-                   <div class="admin-item-resumo">
-                       <strong>${escaparHtml(produto.nome)}</strong>
-                       <span>Disponível: ${produto.estoque}</span>
-                       <small>${escaparHtml(produto.categoria || "Sem categoria")}</small>
-                   </div>
-               `).join("");
+               const fragmento = document.createDocumentFragment();
+               estoqueBaixo.forEach((produto) => {
+                   const linha = document.createElement("div");
+                   linha.className = "admin-item-resumo";
+                   linha.append(
+                       criarElementoTexto("strong", "", produto.nome || "Produto"),
+                       criarElementoTexto("span", "", `Disponível: ${produto.estoque}`),
+                       criarElementoTexto("small", "", produto.categoria || "Sem categoria")
+                   );
+                   fragmento.appendChild(linha);
+               });
+               listaEstoqueBaixo.replaceChildren(fragmento);
            }
        }
     } catch (erro) {
        console.error("Erro ao carregar resumo administrativo:", erro);
        if (listaPedidosRecentes) {
-           listaPedidosRecentes.innerHTML = '<p class="sem-produtos">Não foi possível carregar os pedidos.</p>';
+           mostrarEstadoLista(listaPedidosRecentes, "Não foi possível carregar os pedidos.");
        }
        if (listaEstoqueBaixo) {
-           listaEstoqueBaixo.innerHTML = '<p class="sem-produtos">Não foi possível carregar o estoque.</p>';
+           mostrarEstadoLista(listaEstoqueBaixo, "Não foi possível carregar o estoque.");
        }
     }
 }
@@ -597,171 +593,95 @@ function renderizarProdutos(lista) {
        Caso não existam produtos.
     */
     if (!lista.length) {
-
-        listaProdutos.innerHTML = `
-            <p class="sem-produtos">
-                Nenhum produto encontrado.
-            </p>
-        `;
-
+        mostrarEstadoLista(listaProdutos, "Nenhum produto encontrado.");
         return;
     }
 
-
-    /*
-       Limpamos o container antes de criar os cards.
-    */
-    listaProdutos.innerHTML = "";
-
+    const fragmento = document.createDocumentFragment();
 
     lista.forEach(
         (produto) => {
-
             const card = document.createElement("article");
-
             card.className = "admin-produto-card";
 
-
-            /*
-               Verifica se existe URL de imagem.
-            */
             const possuiImagem =
                 produto.imagem_url &&
                 String(produto.imagem_url).trim() !== "";
 
-
-            /*
-               Define classe visual do status.
-            */
             const classeStatus =
                 produto.status === "ATIVO"
                     ? "ativo"
                     : "inativo";
 
-
-            /*
-               Define o texto do botão.
-
-               Produto ativo:
-               Desativar
-
-               Produto inativo:
-               Reativar
-            */
             const textoBotaoStatus =
                 produto.status === "ATIVO"
                     ? "Desativar"
                     : "Reativar";
 
+            const areaImagem = document.createElement("div");
+            areaImagem.className = "admin-produto-imagem";
+            if (possuiImagem) {
+                const imagem = document.createElement("img");
+                imagem.src = produto.imagem_url;
+                imagem.alt = produto.nome || "Imagem do produto";
+                imagem.loading = "lazy";
+                imagem.addEventListener("error", () => {
+                    imagem.remove();
+                    areaImagem.appendChild(
+                        criarElementoTexto("span", "admin-produto-sem-imagem", "Weblue")
+                    );
+                }, { once: true });
+                areaImagem.appendChild(imagem);
+            } else {
+                areaImagem.appendChild(
+                    criarElementoTexto("span", "admin-produto-sem-imagem", "Weblue")
+                );
+            }
 
-            /*
-               Conteúdo da imagem.
-            */
-            const htmlImagem = possuiImagem
+            const statusProduto = criarElementoTexto(
+                "span",
+                `status-produto ${classeStatus}`,
+                produto.status || "INDEFINIDO"
+            );
+            areaImagem.appendChild(statusProduto);
 
-                ? `
-                    <img
-                        src="${escaparHtml(produto.imagem_url)}"
-                        alt="${escaparHtml(produto.nome)}"
-                    >
-                `
+            const conteudo = document.createElement("div");
+            conteudo.className = "admin-produto-conteudo";
+            conteudo.append(
+                criarElementoTexto("span", "admin-produto-categoria", produto.categoria || "Sem categoria"),
+                criarElementoTexto("h3", "admin-produto-nome", produto.nome || "Produto Weblue"),
+                criarElementoTexto("p", "admin-produto-marca", produto.marca || "Sem marca"),
+                criarElementoTexto("p", "admin-produto-descricao", produto.descricao || "Produto sem descrição.")
+            );
 
-                : `
-                    <span class="admin-produto-sem-imagem">
-                        Weblue
-                    </span>
-                `;
+            const dados = document.createElement("div");
+            dados.className = "admin-produto-dados";
+            dados.append(
+                criarElementoTexto("strong", "admin-produto-preco", formatarPreco(produto.preco)),
+                criarElementoTexto("span", "admin-produto-estoque", `${produto.estoque} unidade(s)`)
+            );
+            conteudo.appendChild(dados);
 
+            const acoes = document.createElement("div");
+            acoes.className = "admin-produto-acoes";
 
-            /*
-               Montamos o card completo.
-            */
-            card.innerHTML = `
+            const botaoEditar = criarElementoTexto("button", "botao-editar", "Editar");
+            botaoEditar.type = "button";
+            botaoEditar.dataset.id = String(produto.id);
 
-                <div class="admin-produto-imagem">
+            const botaoStatus = criarElementoTexto("button", "botao-status", textoBotaoStatus);
+            botaoStatus.type = "button";
+            botaoStatus.dataset.id = String(produto.id);
+            botaoStatus.dataset.status = produto.status || "";
+            acoes.append(botaoEditar, botaoStatus);
+            conteudo.appendChild(acoes);
 
-                    ${htmlImagem}
-
-                    <span
-                        class="status-produto ${classeStatus}"
-                    >
-                        ${escaparHtml(produto.status)}
-                    </span>
-
-                </div>
-
-
-                <div class="admin-produto-conteudo">
-
-                    <span class="admin-produto-categoria">
-                        ${escaparHtml(produto.categoria)}
-                    </span>
-
-
-                    <h3 class="admin-produto-nome">
-                        ${escaparHtml(produto.nome)}
-                    </h3>
-
-
-                    <p class="admin-produto-marca">
-                        ${escaparHtml(produto.marca || "Sem marca")}
-                    </p>
-
-
-                    <p class="admin-produto-descricao">
-                        ${
-                            escaparHtml(
-                                produto.descricao ||
-                                "Produto sem descrição."
-                            )
-                        }
-                    </p>
-
-
-                    <div class="admin-produto-dados">
-
-                        <strong class="admin-produto-preco">
-                            ${formatarPreco(produto.preco)}
-                        </strong>
-
-
-                        <span class="admin-produto-estoque">
-                            ${escaparHtml(produto.estoque)}
-                            unidade(s)
-                        </span>
-
-                    </div>
-
-
-                    <div class="admin-produto-acoes">
-
-                        <button
-                            type="button"
-                            class="botao-editar"
-                            data-id="${produto.id}"
-                        >
-                            Editar
-                        </button>
-
-
-                        <button
-                            type="button"
-                            class="botao-status"
-                            data-id="${produto.id}"
-                            data-status="${escaparHtml(produto.status)}"
-                        >
-                            ${textoBotaoStatus}
-                        </button>
-
-                    </div>
-
-                </div>
-            `;
-
-
-            listaProdutos.appendChild(card);
+            card.append(areaImagem, conteudo);
+            fragmento.appendChild(card);
         }
     );
+
+    listaProdutos.replaceChildren(fragmento);
 }
 
 

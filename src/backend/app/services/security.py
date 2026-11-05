@@ -1,23 +1,23 @@
-import time
+import hashlib
+import hmac
 import uuid
-from collections import defaultdict, deque
-from datetime import datetime, timedelta, timezone
-from threading import Lock
+from datetime import UTC, datetime, timedelta, timezone
 
 import jwt
 from pwdlib import PasswordHash
+from sqlalchemy import case, delete
+from sqlalchemy.dialects.mysql import insert as mysql_insert
+from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.orm import Session
 
 from ..config import settings
 from ..models.cliente_versao_autenticacao import ClienteVersaoAutenticacao
+from ..models.rate_limit_window import RateLimitWindow
+from ..models.token_revogado import TokenRevogado
 
 
 password_hash = PasswordHash.recommended()
 JWT_ISSUER = "weblue"
-
-_LOGIN_ATTEMPTS = defaultdict(deque)
-_LOGIN_LOCK = Lock()
-_REVOKED_JTIS: set[str] = set()
 
 REFRESH_TOKEN_DIAS = 7
 
@@ -41,49 +41,121 @@ def _get_client_ip(request) -> str:
 
 
 def _attempt_key(request, identifier: str, prefix: str = "login") -> str:
-    """Cria uma chave estável para controlar tentativas por IP e identificador."""
+    """Gera uma chave não reversível para a janela de tentativas."""
 
     ip = _get_client_ip(request)
     email = (identifier or "").strip().lower()
-    return f"{prefix}:{ip}:{email}"
+    return hmac.new(
+        SECRET_KEY.encode("utf-8"),
+        f"{prefix}:{ip}:{email}".encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
 
 
-def is_rate_limited(request, identifier: str, prefix: str = "login", max_attempts: int = 5, window_seconds: int = 900):
+def is_rate_limited(
+    request,
+    identifier: str,
+    database: Session,
+    prefix: str = "login",
+    max_attempts: int = 5,
+    window_seconds: int = 900,
+) -> tuple[bool, int]:
     """Retorna (permite, segundos_restantes) para a chave atual."""
 
-    now = time.time()
+    now = datetime.now(UTC).replace(tzinfo=None)
     key = _attempt_key(request, identifier, prefix)
-
-    with _LOGIN_LOCK:
-        attempts = _LOGIN_ATTEMPTS[key]
-        while attempts and now - attempts[0] > window_seconds:
-            attempts.popleft()
-
-        if len(attempts) >= max_attempts:
-            oldest = attempts[0]
-            retry_after = max(1, int(window_seconds - (now - oldest)))
-            return False, retry_after
-
+    registro = database.get(RateLimitWindow, key)
+    if registro is None:
         return True, 0
 
+    limite = registro.iniciada_em + timedelta(seconds=window_seconds)
+    if limite <= now:
+        return True, 0
 
-def register_failed_attempt(request, identifier: str, prefix: str = "login"):
+    if registro.tentativas >= max_attempts:
+        retry_after = max(1, int((limite - now).total_seconds()))
+        return False, retry_after
+
+    return True, 0
+
+
+def register_failed_attempt(
+    request,
+    identifier: str,
+    database: Session,
+    prefix: str = "login",
+    window_seconds: int = 900,
+) -> None:
     """Registra uma falha de autenticação para a chave atual."""
 
-    now = time.time()
+    now = datetime.now(UTC).replace(tzinfo=None)
     key = _attempt_key(request, identifier, prefix)
+    limite = now - timedelta(seconds=window_seconds)
+    database.execute(
+        delete(RateLimitWindow).where(
+            RateLimitWindow.iniciada_em
+            <= now - timedelta(seconds=max(window_seconds, 86400))
+        )
+    )
+    database.execute(
+        delete(TokenRevogado).where(TokenRevogado.expira_em <= now)
+    )
+    registro = RateLimitWindow(
+        chave=key,
+        tentativas=1,
+        iniciada_em=now,
+    )
+    valores_atualizacao = {
+        "tentativas": case(
+            (RateLimitWindow.iniciada_em <= limite, 1),
+            else_=RateLimitWindow.tentativas + 1,
+        ),
+        "iniciada_em": case(
+            (RateLimitWindow.iniciada_em <= limite, now),
+            else_=RateLimitWindow.iniciada_em,
+        ),
+    }
 
-    with _LOGIN_LOCK:
-        _LOGIN_ATTEMPTS[key].append(now)
+    dialect = database.get_bind().dialect.name
+    if dialect == "mysql":
+        statement = mysql_insert(RateLimitWindow).values(
+            chave=registro.chave,
+            tentativas=registro.tentativas,
+            iniciada_em=registro.iniciada_em,
+        )
+        statement = statement.on_duplicate_key_update(**valores_atualizacao)
+    elif dialect == "sqlite":
+        statement = sqlite_insert(RateLimitWindow).values(
+            chave=registro.chave,
+            tentativas=registro.tentativas,
+            iniciada_em=registro.iniciada_em,
+        )
+        statement = statement.on_conflict_do_update(
+            index_elements=[RateLimitWindow.chave],
+            set_=valores_atualizacao,
+        )
+    else:
+        raise RuntimeError(
+            f"Banco não suportado para rate limit persistente: {dialect}"
+        )
+
+    database.execute(statement)
+    database.commit()
 
 
-def clear_attempts(request, identifier: str, prefix: str = "login"):
+def clear_attempts(
+    request,
+    identifier: str,
+    database: Session,
+    prefix: str = "login",
+) -> None:
     """Limpa tentativas anteriores após sucesso."""
 
     key = _attempt_key(request, identifier, prefix)
-
-    with _LOGIN_LOCK:
-        _LOGIN_ATTEMPTS.pop(key, None)
+    database.execute(
+        delete(RateLimitWindow).where(RateLimitWindow.chave == key)
+    )
+    database.commit()
 
 
 # =========================
@@ -188,31 +260,67 @@ def criar_refresh_token_cliente(
     return token, jti
 
 
-def extrair_jti(token: str) -> str | None:
-    """Extrai o identificador do token sem validar assinatura ou expiração."""
+def revogar_token(token: str | None, database: Session) -> None:
+    if not token:
+        return
 
     try:
-        payload = jwt.decode(
+        dados_token = jwt.decode(
             token,
-            options={
-                "verify_signature": False,
-                "verify_exp": False,
-                "verify_iat": False,
-                "verify_nbf": False,
-            },
+            SECRET_KEY,
+            algorithms=[ALGORITHM],
+            issuer=JWT_ISSUER,
+            options={"verify_exp": False},
         )
-        return payload.get("jti")
-    except Exception:
-        return None
+        jti = dados_token.get("jti")
+        expiracao = dados_token.get("exp")
+        if not isinstance(jti, str) or not isinstance(expiracao, (int, float)):
+            return
+
+        expira_em = datetime.fromtimestamp(expiracao, UTC).replace(tzinfo=None)
+        if expira_em <= datetime.now(UTC).replace(tzinfo=None):
+            return
+    except (jwt.InvalidTokenError, ValueError, TypeError, KeyError, OverflowError):
+        return
+
+    registro = TokenRevogado(jti=jti, expira_em=expira_em)
+    dialect = database.get_bind().dialect.name
+    if dialect == "mysql":
+        statement = mysql_insert(TokenRevogado).values(
+            jti=registro.jti,
+            expira_em=registro.expira_em,
+        ).on_duplicate_key_update(jti=registro.jti)
+    elif dialect == "sqlite":
+        statement = sqlite_insert(TokenRevogado).values(
+            jti=registro.jti,
+            expira_em=registro.expira_em,
+        ).on_conflict_do_nothing(index_elements=[TokenRevogado.jti])
+    else:
+        raise RuntimeError(
+            f"Banco não suportado para revogação persistente: {dialect}"
+        )
+
+    agora = datetime.now(UTC).replace(tzinfo=None)
+    database.execute(
+        delete(TokenRevogado).where(TokenRevogado.expira_em <= agora)
+    )
+    database.execute(statement)
+    database.commit()
 
 
-def revogar_token(jti: str | None) -> None:
-    if jti:
-        _REVOKED_JTIS.add(jti)
+def token_foi_revogado(jti: str | None, database: Session) -> bool:
+    if not jti:
+        return False
 
-
-def token_foi_revogado(jti: str | None) -> bool:
-    return bool(jti and jti in _REVOKED_JTIS)
+    agora = datetime.now(UTC).replace(tzinfo=None)
+    registro = database.get(TokenRevogado, jti)
+    if registro is None:
+        return False
+    if registro.expira_em <= agora:
+        database.delete(registro)
+        database.commit()
+        return False
+    return True
 
 
 # =========================
@@ -221,7 +329,7 @@ def token_foi_revogado(jti: str | None) -> bool:
 
 def verificar_token_acesso(
     token: str,
-    database: Session | None = None,
+    database: Session,
 ) -> int | None:
     """
     Valida o token de acesso.
@@ -249,7 +357,7 @@ def verificar_token_acesso(
             return None
 
         jti = dados_token.get("jti")
-        if token_foi_revogado(jti):
+        if token_foi_revogado(jti, database):
             return None
 
         cliente_id = dados_token.get("sub")
@@ -275,7 +383,7 @@ def verificar_token_acesso(
 
 def verificar_refresh_token_cliente(
     token: str,
-    database: Session | None = None,
+    database: Session,
 ) -> int | None:
     """Valida refresh token do cliente e rejeita tokens revogados."""
 
@@ -297,7 +405,7 @@ def verificar_refresh_token_cliente(
             return None
 
         jti = dados_token.get("jti")
-        if token_foi_revogado(jti):
+        if token_foi_revogado(jti, database):
             return None
 
         cliente_id = dados_token.get("sub")

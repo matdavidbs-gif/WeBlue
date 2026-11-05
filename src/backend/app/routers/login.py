@@ -9,7 +9,6 @@ from ..services.security import (
     clear_attempts,
     criar_refresh_token_cliente,
     criar_token_acesso,
-    extrair_jti,
     is_rate_limited,
     obter_versao_autenticacao_cliente,
     register_failed_attempt,
@@ -38,6 +37,7 @@ def realizar_login(
     permitido, retry_after = is_rate_limited(
         request,
         str(dados.email),
+        database,
         prefix="login_cliente",
         max_attempts=5,
         window_seconds=900,
@@ -67,6 +67,7 @@ def realizar_login(
         register_failed_attempt(
             request,
             str(dados.email),
+            database,
             prefix="login_cliente"
         )
         raise HTTPException(
@@ -79,6 +80,7 @@ def realizar_login(
         register_failed_attempt(
             request,
             str(dados.email),
+            database,
             prefix="login_cliente"
         )
         raise HTTPException(
@@ -91,6 +93,7 @@ def realizar_login(
         register_failed_attempt(
             request,
             str(dados.email),
+            database,
             prefix="login_cliente"
         )
         raise HTTPException(
@@ -98,7 +101,7 @@ def realizar_login(
             detail="Esta conta está inativa."
         )
 
-    clear_attempts(request, str(dados.email), prefix="login_cliente")
+    clear_attempts(request, str(dados.email), database, prefix="login_cliente")
 
     # Gera o JWT
     # Se "lembrar" for True, o token terá duração maior
@@ -158,8 +161,7 @@ def refresh_cliente(
             detail="Cliente não encontrado."
         )
 
-    jti_antigo = extrair_jti(refresh_token)
-    revogar_token(jti_antigo)
+    revogar_token(refresh_token, database)
 
     versao_autenticacao = obter_versao_autenticacao_cliente(
         database,
@@ -192,8 +194,8 @@ def logout_cliente(
     refresh_token = dados.refresh_token
 
     if access_token:
-        revogar_token(extrair_jti(access_token))
+        revogar_token(access_token, database)
     if refresh_token:
-        revogar_token(extrair_jti(refresh_token))
+        revogar_token(refresh_token, database)
 
     return {"mensagem": "Logout realizado com sucesso."}

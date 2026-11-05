@@ -71,7 +71,7 @@ function renderCarrinho() {
     }
 
     if (!carrinho.length) {
-        listaCarrinho.innerHTML = "";
+        listaCarrinho.replaceChildren();
         if (mensagemCarrinho) {
             mensagemCarrinho.textContent = "Seu carrinho está vazio. Adicione produtos antes de continuar.";
         }
@@ -90,30 +90,54 @@ function renderCarrinho() {
 
     let total = 0;
     let quantidadeTotal = 0;
+    const fragmento = document.createDocumentFragment();
 
-    listaCarrinho.innerHTML = carrinho
-        .map((item) => {
-            const subtotal = Number(item.preco || 0) * Number(item.quantidade || 0);
-            total += subtotal;
-            quantidadeTotal += Number(item.quantidade || 0);
+    carrinho.forEach((item) => {
+        const subtotal = Number(item.preco || 0) * Number(item.quantidade || 0);
+        const quantidade = Number(item.quantidade || 0);
+        total += subtotal;
+        quantidadeTotal += quantidade;
 
-            return `
-                <article class="item">
-                    <div>
-                        <h3>${item.nome || "Produto Weblue"}</h3>
-                        <p>${formatarPreco(item.preco || 0)} cada</p>
-                        <div class="controls">
-                            <button type="button" data-acao="diminuir" data-id="${item.id}">-</button>
-                            <span>${item.quantidade}</span>
-                            <button type="button" data-acao="aumentar" data-id="${item.id}">+</button>
-                            <button type="button" data-acao="remover" data-id="${item.id}" style="background:#f9d3d3;">Remover</button>
-                        </div>
-                    </div>
-                    <strong>${formatarPreco(subtotal)}</strong>
-                </article>
-            `;
-        })
-        .join("");
+        const artigo = document.createElement("article");
+        artigo.className = "item";
+
+        const detalhes = document.createElement("div");
+        const nome = document.createElement("h3");
+        nome.textContent = item.nome || "Produto Weblue";
+
+        const precoUnitario = document.createElement("p");
+        precoUnitario.textContent = `${formatarPreco(item.preco || 0)} cada`;
+
+        const controles = document.createElement("div");
+        controles.className = "controls";
+
+        const criarBotao = (acao, texto, classe = "") => {
+            const botao = document.createElement("button");
+            botao.type = "button";
+            botao.dataset.acao = acao;
+            botao.dataset.id = String(item.id);
+            botao.textContent = texto;
+            if (classe) {
+                botao.className = classe;
+            }
+            return botao;
+        };
+
+        const diminuir = criarBotao("diminuir", "-");
+        const quantidadeTexto = document.createElement("span");
+        quantidadeTexto.textContent = String(quantidade);
+        const aumentar = criarBotao("aumentar", "+");
+        const remover = criarBotao("remover", "Remover", "btn-secondary");
+
+        controles.append(diminuir, quantidadeTexto, aumentar, remover);
+        detalhes.append(nome, precoUnitario, controles);
+
+        const subtotalTexto = document.createElement("strong");
+        subtotalTexto.textContent = formatarPreco(subtotal);
+        artigo.append(detalhes, subtotalTexto);
+        fragmento.appendChild(artigo);
+    });
+    listaCarrinho.replaceChildren(fragmento);
 
     if (quantidadeItens) {
         quantidadeItens.textContent = `${quantidadeTotal} item${quantidadeTotal === 1 ? "" : "s"}`;
@@ -123,24 +147,27 @@ function renderCarrinho() {
         totalCarrinho.textContent = formatarPreco(total);
     }
 
-    document.querySelectorAll("[data-acao]").forEach((botao) => {
-        const acao = botao.dataset.acao;
-        const produtoId = Number(botao.dataset.id);
-
-        botao.addEventListener("click", () => {
-            if (acao === "aumentar") {
-                alterarQuantidade(produtoId, 1);
-            }
-
-            if (acao === "diminuir") {
-                alterarQuantidade(produtoId, -1);
-            }
-
-            if (acao === "remover") {
-                removerDoCarrinho(produtoId);
-            }
-        });
-    });
 }
+
+listaCarrinho?.addEventListener("click", (evento) => {
+    const botao = evento.target.closest("[data-acao]");
+    if (!botao || !listaCarrinho.contains(botao)) {
+        return;
+    }
+
+    const acao = botao.dataset.acao;
+    const produtoId = Number(botao.dataset.id);
+    if (!Number.isFinite(produtoId)) {
+        return;
+    }
+
+    if (acao === "aumentar") {
+        alterarQuantidade(produtoId, 1);
+    } else if (acao === "diminuir") {
+        alterarQuantidade(produtoId, -1);
+    } else if (acao === "remover") {
+        removerDoCarrinho(produtoId);
+    }
+});
 
 renderCarrinho();

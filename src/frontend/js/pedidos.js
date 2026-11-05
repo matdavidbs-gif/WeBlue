@@ -16,21 +16,45 @@ function formatarPreco(valor) {
 }
 
 function renderPedido(pedido) {
-    const itens = (pedido.itens || [])
-        .map((item) => `<li>${item.quantidade}x ${item.nome} — ${formatarPreco(item.subtotal)}</li>`)
-        .join("");
+    const artigo = document.createElement("article");
+    artigo.className = "pedido";
 
-    return `
-        <article class="pedido">
-            <div class="pedido-header">
-                <strong>Pedido #${pedido.id}</strong>
-                <span class="badge">${pedido.status}</span>
-            </div>
-            <p>Data: ${pedido.criado_em ? new Date(pedido.criado_em).toLocaleString("pt-BR") : "-"}</p>
-            <p>Total: <strong>${formatarPreco(pedido.valor_total)}</strong></p>
-            <ul>${itens || "<li>Sem itens registrados.</li>"}</ul>
-        </article>
-    `;
+    const cabecalho = document.createElement("div");
+    cabecalho.className = "pedido-header";
+
+    const identificador = document.createElement("strong");
+    identificador.textContent = `Pedido #${pedido.id}`;
+
+    const status = document.createElement("span");
+    status.className = "badge";
+    status.textContent = pedido.status || "Indefinido";
+    cabecalho.append(identificador, status);
+
+    const data = document.createElement("p");
+    data.textContent = `Data: ${pedido.criado_em ? new Date(pedido.criado_em).toLocaleString("pt-BR") : "-"}`;
+
+    const total = document.createElement("p");
+    total.append(document.createTextNode("Total: "));
+    const precoTotal = document.createElement("strong");
+    precoTotal.textContent = formatarPreco(pedido.valor_total);
+    total.appendChild(precoTotal);
+
+    const listaItens = document.createElement("ul");
+    const itens = Array.isArray(pedido.itens) ? pedido.itens : [];
+    if (!itens.length) {
+        const itemVazio = document.createElement("li");
+        itemVazio.textContent = "Sem itens registrados.";
+        listaItens.appendChild(itemVazio);
+    } else {
+        itens.forEach((item) => {
+            const linha = document.createElement("li");
+            linha.textContent = `${item.quantidade}x ${item.nome || "Produto"} — ${formatarPreco(item.subtotal)}`;
+            listaItens.appendChild(linha);
+        });
+    }
+
+    artigo.append(cabecalho, data, total, listaItens);
+    return artigo;
 }
 
 async function buscarPedidos() {
@@ -63,7 +87,7 @@ async function buscarPedidos() {
 
         if (!pedidos.length) {
             if (listaPedidos) {
-                listaPedidos.innerHTML = "";
+                listaPedidos.replaceChildren();
             }
             if (mensagemPedidos) {
                 mensagemPedidos.textContent = "Sua conta ainda não possui pedidos.";
@@ -76,7 +100,9 @@ async function buscarPedidos() {
         }
 
         if (listaPedidos) {
-            listaPedidos.innerHTML = pedidos.map(renderPedido).join("");
+            const fragmento = document.createDocumentFragment();
+            pedidos.forEach((pedido) => fragmento.appendChild(renderPedido(pedido)));
+            listaPedidos.replaceChildren(fragmento);
         }
     } catch (erro) {
         console.error("Erro ao buscar pedidos.", erro);

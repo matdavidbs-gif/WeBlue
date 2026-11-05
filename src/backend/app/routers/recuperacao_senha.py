@@ -51,6 +51,7 @@ def solicitar_recuperacao(
     permitido, retry_after = is_rate_limited(
         request,
         email,
+        database,
         prefix="recuperacao_cliente",
         max_attempts=3,
         window_seconds=900,
@@ -63,7 +64,13 @@ def solicitar_recuperacao(
                 f"Tente novamente em {retry_after} segundos."
             ),
         )
-    register_failed_attempt(request, email, prefix="recuperacao_cliente")
+    register_failed_attempt(
+        request,
+        email,
+        database,
+        prefix="recuperacao_cliente",
+        window_seconds=900,
+    )
 
     try:
         validar_configuracao_email()

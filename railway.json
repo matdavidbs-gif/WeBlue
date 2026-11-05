@@ -3,6 +3,9 @@
     "builder": "RAILPACK"
   },
   "deploy": {
+    "preDeployCommand": [
+      "python -m alembic -c src/backend/alembic.ini upgrade head"
+    ],
     "startCommand": "python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT --app-dir src",
     "healthcheckPath": "/health",
     "healthcheckTimeout": 100,

@@ -72,8 +72,9 @@ def exigir_cliente_autenticado(
 
 def exigir_admin_autenticado(
     credenciais: HTTPAuthorizationCredentials = Depends(seguranca_admin),
+    database: Session = Depends(get_database),
 ) -> int:
-    admin_id = verificar_token_admin(credenciais.credentials)
+    admin_id = verificar_token_admin(credenciais.credentials, database)
     if admin_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

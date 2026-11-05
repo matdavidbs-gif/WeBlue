@@ -2,10 +2,6 @@
 # IMPORTAÇÕES PADRÃO DO PYTHON
 # ============================================================
 
-# Permite executar ações quando a aplicação inicia
-# e quando ela é encerrada.
-from contextlib import asynccontextmanager
-
 # Facilita a construção dos caminhos das pastas.
 from pathlib import Path
 
@@ -52,45 +48,9 @@ from sqlalchemy import text
 # BANCO DE DADOS
 # ============================================================
 
-# Base:
-# classe principal dos models SQLAlchemy.
-#
 # engine:
 # conexão principal com o MySQL.
-from .database import (
-    Base,
-    engine,
-)
-
-
-# ============================================================
-# MODELS
-# ============================================================
-
-# IMPORTANTE:
-#
-# Os models precisam ser importados antes de:
-#
-# Base.metadata.create_all(...)
-#
-# Dessa forma o SQLAlchemy conhece as tabelas
-# que fazem parte do projeto.
-
-
-# Model da tabela clientes.
-from .models.cliente import Cliente
-from .models.cliente_versao_autenticacao import ClienteVersaoAutenticacao
-
-# Model da tabela produtos.
-from .models.produto import Produto
-
-# Model da tabela administradores.
-from .models.administrador import Administrador
-
-# Modelos das tabelas de pedidos.
-from .models.item_pedido import ItemPedido
-from .models.pedido import Pedido
-from .models.token_recuperacao_senha import TokenRecuperacaoSenha
+from .database import engine
 
 
 # ============================================================
@@ -130,31 +90,6 @@ FRONTEND_DIR = (
 
 
 # ============================================================
-# INICIALIZAÇÃO DA APLICAÇÃO
-# ============================================================
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-
-    # Cria automaticamente as tabelas que ainda
-    # não existem no banco.
-    #
-    # Como os modelos foram importados acima,
-    # o SQLAlchemy conhece:
-    #
-    # clientes
-    # produtos
-    # pedidos
-    # itens_pedido
-    Base.metadata.create_all(
-        bind=engine
-    )
-
-    # A aplicação continua sua inicialização.
-    yield
-
-
-# ============================================================
 # CRIAÇÃO DO FASTAPI
 # ============================================================
 
@@ -170,9 +105,6 @@ app = FastAPI(
 
     # Versão atual da API.
     version="1.0.0",
-
-    # Define o ciclo de vida da aplicação.
-    lifespan=lifespan,
 )
 
 

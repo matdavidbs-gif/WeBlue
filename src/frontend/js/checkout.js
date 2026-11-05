@@ -82,7 +82,9 @@ function renderResumo() {
     }
 
     if (!carrinho.length) {
-        resumoCheckout.innerHTML = "<p>Seu carrinho está vazio.</p>";
+        const mensagemVazia = document.createElement("p");
+        mensagemVazia.textContent = "Seu carrinho está vazio.";
+        resumoCheckout.replaceChildren(mensagemVazia);
         if (totalCheckout) {
             totalCheckout.textContent = "R$ 0,00";
         }
@@ -90,18 +92,24 @@ function renderResumo() {
     }
 
     let total = 0;
-    resumoCheckout.innerHTML = carrinho
-        .map((item) => {
-            const subtotal = Number(item.preco || 0) * Number(item.quantidade || 0);
-            total += subtotal;
-            return `
-                <div class="resumo-item">
-                    <span>${item.quantidade}x ${item.nome}</span>
-                    <strong>${formatarPreco(subtotal)}</strong>
-                </div>
-            `;
-        })
-        .join("");
+    const fragmento = document.createDocumentFragment();
+    carrinho.forEach((item) => {
+        const subtotal = Number(item.preco || 0) * Number(item.quantidade || 0);
+        total += subtotal;
+
+        const linha = document.createElement("div");
+        linha.className = "resumo-item";
+
+        const nome = document.createElement("span");
+        nome.textContent = `${item.quantidade}x ${item.nome || "Produto Weblue"}`;
+
+        const preco = document.createElement("strong");
+        preco.textContent = formatarPreco(subtotal);
+
+        linha.append(nome, preco);
+        fragmento.appendChild(linha);
+    });
+    resumoCheckout.replaceChildren(fragmento);
 
     if (totalCheckout) {
         totalCheckout.textContent = formatarPreco(total);

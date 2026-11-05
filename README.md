@@ -20,6 +20,8 @@ API em FastAPI e persistência em MySQL.
 - Cadastro com validação de nome, e-mail, CPF, telefone, senha e aceite dos
   termos.
 - Login, perfil, atualização de dados e logout com tokens JWT.
+- Limitação de tentativas e revogação de tokens persistidas no MySQL e
+  compartilhadas entre instâncias.
 - Recuperação de senha por link enviado por SMTP. O token expira em 15 minutos,
   é armazenado no banco somente como hash, só pode ser usado uma vez e novas
   solicitações invalidam o token anterior.
@@ -75,9 +77,11 @@ O script [001_criar_tabela_clientes.sql](./database/ddl/001_criar_tabela_cliente
 cria o banco `weblue` e a tabela inicial de clientes. Execute-o no MySQL antes
 de iniciar a aplicação, por exemplo, pelo MySQL Workbench ou cliente MySQL.
 
-Na inicialização, o SQLAlchemy cria tabelas que ainda não existam. Isso **não é
-um sistema de migrações**: alterações em tabelas existentes devem ser
-controladas e aplicadas manualmente.
+As tabelas são gerenciadas pelo Alembic. Aplique as migrações após configurar o
+arquivo `.env`, conforme a etapa 4. A migração inicial cria tabelas ausentes sem
+alterar as existentes; a seguinte cria o armazenamento compartilhado de
+tentativas de login e tokens revogados. Para mudanças futuras, crie uma nova
+revisão Alembic e aplique-a antes de iniciar as instâncias da aplicação.
 
 ### 3. Configurar variáveis de ambiente
 
@@ -113,7 +117,18 @@ conjunto. `FRONTEND_BASE_URL` deve ser a origem onde a página
 `/recuperar-senha` está hospedada; em produção, use HTTPS. Sem SMTP válido,
 solicitações de recuperação retornam `503 Service Unavailable`.
 
-### 4. Iniciar a aplicação
+### 4. Aplicar migrações
+
+Na raiz do repositório, com o `.env` configurado e o MySQL acessível:
+
+```powershell
+python -m alembic -c src/backend/alembic.ini upgrade head
+```
+
+O Railway executa esse comando uma vez no estágio de pré-deploy, antes de
+iniciar as instâncias da API.
+
+### 5. Iniciar a aplicação
 
 Na raiz do repositório:
 
@@ -204,9 +219,10 @@ variáveis do banco e JWT listadas acima e, se for usar recuperação de senha,
 também as variáveis SMTP com a URL HTTPS pública. O banco MySQL deve estar
 provisionado e acessível pelo serviço.
 
-O projeto ainda não inclui migrações versionadas nem gateway de pagamento; faça
-essas configurações e validações antes de considerar o deploy adequado para
-produção.
+As migrações são aplicadas uma vez no estágio `preDeployCommand` do
+[railway.json](./railway.json), evitando que cada réplica tente migrar o banco.
+O projeto ainda não inclui gateway de pagamento; faça essa integração e
+validação antes de considerar o deploy adequado para transações reais.
 
 ## Estrutura do repositório
 

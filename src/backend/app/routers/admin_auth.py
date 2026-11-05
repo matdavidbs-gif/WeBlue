@@ -75,7 +75,6 @@ from ..schemas.administrador import (
 from ..services.admin_security import (
     criar_refresh_token_admin,
     criar_token_admin,
-    extrair_jti,
     revogar_token,
     verificar_refresh_token_admin,
     verificar_senha_admin,
@@ -124,6 +123,7 @@ def login_administrador(
     permitido, retry_after = is_rate_limited(
         request,
         email,
+        db,
         prefix="login_admin",
         max_attempts=5,
         window_seconds=900,
@@ -144,7 +144,7 @@ def login_administrador(
     )
 
     if administrador is None:
-        register_failed_attempt(request, email, prefix="login_admin")
+        register_failed_attempt(request, email, db, prefix="login_admin")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="E-mail ou senha inválidos.",
@@ -154,7 +154,7 @@ def login_administrador(
         )
 
     if not administrador.ativo:
-        register_failed_attempt(request, email, prefix="login_admin")
+        register_failed_attempt(request, email, db, prefix="login_admin")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Acesso administrativo desativado."
@@ -166,7 +166,7 @@ def login_administrador(
     )
 
     if not senha_correta:
-        register_failed_attempt(request, email, prefix="login_admin")
+        register_failed_attempt(request, email, db, prefix="login_admin")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="E-mail ou senha inválidos.",
@@ -175,7 +175,7 @@ def login_administrador(
             }
         )
 
-    clear_attempts(request, email, prefix="login_admin")
+    clear_attempts(request, email, db, prefix="login_admin")
 
     access_token = criar_token_admin(
         administrador.id
@@ -217,7 +217,7 @@ def refresh_administrador(
             detail="Refresh token ausente."
         )
 
-    administrador_id = verificar_refresh_token_admin(refresh_token)
+    administrador_id = verificar_refresh_token_admin(refresh_token, db)
     if administrador_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -231,7 +231,7 @@ def refresh_administrador(
             detail="Administrador não encontrado."
         )
 
-    revogar_token(extrair_jti(refresh_token))
+    revogar_token(refresh_token, db)
     novo_access_token = criar_token_admin(administrador.id)
     novo_refresh_token, _ = criar_refresh_token_admin(administrador.id)
 
@@ -252,8 +252,8 @@ def logout_administrador(
     refresh_token = dados.refresh_token
 
     if access_token:
-        revogar_token(extrair_jti(access_token))
+        revogar_token(access_token, db)
     if refresh_token:
-        revogar_token(extrair_jti(refresh_token))
+        revogar_token(refresh_token, db)
 
     return {"mensagem": "Logout realizado com sucesso."}

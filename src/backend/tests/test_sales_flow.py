@@ -27,6 +27,8 @@ from app.models.cliente_versao_autenticacao import ClienteVersaoAutenticacao
 from app.models.item_pedido import ItemPedido
 from app.models.pedido import Pedido
 from app.models.produto import Produto
+from app.models.rate_limit_window import RateLimitWindow
+from app.models.token_revogado import TokenRevogado
 from app.services.security import criar_token_acesso
 
 
@@ -50,11 +52,15 @@ def sales_database_session():
     Produto.__table__.create(bind=engine, checkfirst=True)
     Pedido.__table__.create(bind=engine, checkfirst=True)
     ItemPedido.__table__.create(bind=engine, checkfirst=True)
+    RateLimitWindow.__table__.create(bind=engine, checkfirst=True)
+    TokenRevogado.__table__.create(bind=engine, checkfirst=True)
 
     session = TestingSessionLocal()
     try:
         session.query(ItemPedido).delete()
         session.query(Pedido).delete()
+        session.query(RateLimitWindow).delete()
+        session.query(TokenRevogado).delete()
         session.query(ClienteVersaoAutenticacao).delete()
         session.query(Cliente).delete()
         session.query(Produto).delete()

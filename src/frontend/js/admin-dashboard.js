@@ -130,7 +130,7 @@ async function carregarEstoque() {
             );
 
         if (containerBaixoEstoque) {
-            containerBaixoEstoque.innerHTML = "";
+            containerBaixoEstoque.replaceChildren();
         }
 
         dados.produtos.forEach(produto => {
@@ -142,14 +142,17 @@ async function carregarEstoque() {
                 containerBaixoEstoque
             ) {
 
-                containerBaixoEstoque.innerHTML += `
-                    <div class="alerta-produto">
-                        <strong>${produto.nome}</strong>
-                        <span>
-                            ${produto.estoque} unidade(s)
-                        </span>
-                    </div>
-                `;
+                const alerta = document.createElement("div");
+                alerta.className = "alerta-produto";
+
+                const nome = document.createElement("strong");
+                nome.textContent = produto.nome || "Produto";
+
+                const estoque = document.createElement("span");
+                estoque.textContent = `${produto.estoque} unidade(s)`;
+
+                alerta.append(nome, estoque);
+                containerBaixoEstoque.appendChild(alerta);
             }
 
         });
@@ -198,18 +201,19 @@ async function carregarProdutosMaisVendidos() {
             return;
         }
 
-        tabela.innerHTML = "";
+        const fragmento = document.createDocumentFragment();
 
         produtos.forEach(produto => {
-
-            tabela.innerHTML += `
-                <tr>
-                    <td>${produto.produto}</td>
-                    <td>${produto.quantidade_vendida}</td>
-                </tr>
-            `;
+            const linha = document.createElement("tr");
+            const nome = document.createElement("td");
+            nome.textContent = produto.produto || "Produto";
+            const quantidade = document.createElement("td");
+            quantidade.textContent = String(produto.quantidade_vendida ?? 0);
+            linha.append(nome, quantidade);
+            fragmento.appendChild(linha);
 
         });
+        tabela.replaceChildren(fragmento);
 
     } catch (erro) {
 
@@ -253,33 +257,28 @@ async function carregarUltimosPedidos() {
             return;
         }
 
-        container.innerHTML = "";
-
+        const fragmento = document.createDocumentFragment();
         dados.pedidos
             .slice(0, 5)
             .forEach(pedido => {
+                const venda = document.createElement("div");
+                venda.className = "venda";
 
-                container.innerHTML += `
-                    <div class="venda">
+                const detalhes = document.createElement("div");
+                const identificador = document.createElement("strong");
+                identificador.textContent = `Pedido #${pedido.id}`;
+                const status = document.createElement("div");
+                status.textContent = pedido.status || "Indefinido";
+                detalhes.append(identificador, document.createElement("br"), status);
 
-                        <div>
-                            <strong>
-                                Pedido #${pedido.id}
-                            </strong>
-                            <br>
-                            ${pedido.status}
-                        </div>
+                const valor = document.createElement("div");
+                valor.textContent = formatarMoeda(pedido.valor_total);
 
-                        <div>
-                            ${formatarMoeda(
-                                pedido.valor_total
-                            )}
-                        </div>
-
-                    </div>
-                `;
+                venda.append(detalhes, valor);
+                fragmento.appendChild(venda);
 
             });
+        container.replaceChildren(fragmento);
 
     } catch (erro) {
 

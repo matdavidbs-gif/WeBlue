@@ -87,9 +87,10 @@ seguranca_admin = HTTPBearer()
 
 
 def exigir_admin_autenticado(
-    credenciais: HTTPAuthorizationCredentials = Depends(seguranca_admin)
+    credenciais: HTTPAuthorizationCredentials = Depends(seguranca_admin),
+    database: Session = Depends(get_database),
 ) -> int:
-    admin_id = verificar_token_admin(credenciais.credentials)
+    admin_id = verificar_token_admin(credenciais.credentials, database)
 
     if admin_id is None:
         raise HTTPException(

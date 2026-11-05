@@ -438,7 +438,7 @@ function exibirProdutos(lista) {
 
 
     // Limpa os cards anteriores.
-    listaProdutos.innerHTML = "";
+    listaProdutos.replaceChildren();
 
 
     // ========================================================
